@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Weet u zeker dat u ‘{0}’ naar de Prullenbak wilt
 Delete.Permanent.Title: "Definitief verwijderen"
 Drop.Copy: "Hier kopiëren"
 Drop.Move: "Hierheen verplaatsen"
+Drop.Shortcut: "Snelkoppeling hier maken"
 Enum.DiffStatus.Different: "Verschillend"
 Enum.DiffStatus.Identical: "Identiek"
 Enum.DiffStatus.LeftOnly: "Alleen links"

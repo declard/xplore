@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Voulez-vous vraiment placer '{0}' dans la Corbeille 
 Delete.Permanent.Title: "Supprimer définitivement"
 Drop.Copy: "Copier ici"
 Drop.Move: "Déplacer ici"
+Drop.Shortcut: "Créer un raccourci ici"
 Enum.DiffStatus.Different: "Différent"
 Enum.DiffStatus.Identical: "Identique"
 Enum.DiffStatus.LeftOnly: "Gauche uniquement"

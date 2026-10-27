@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Вы действительно хотите пер�
 Delete.Permanent.Title: "Окончательное удаление"
 Drop.Copy: "Копировать сюда"
 Drop.Move: "Переместить сюда"
+Drop.Shortcut: "Создать ярлык здесь"
 Enum.DiffStatus.Different: "Различаются"
 Enum.DiffStatus.Identical: "Идентичны"
 Enum.DiffStatus.LeftOnly: "Только слева"

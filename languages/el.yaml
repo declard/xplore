@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Είστε βέβαιοι ότι θέλετε να �
 Delete.Permanent.Title: "Οριστική διαγραφή"
 Drop.Copy: "Αντιγραφή εδώ"
 Drop.Move: "Μετακίνηση εδώ"
+Drop.Shortcut: "Δημιουργία συντόμευσης εδώ"
 Enum.DiffStatus.Different: "Διαφορετικά"
 Enum.DiffStatus.Identical: "Πανομοιότυπα"
 Enum.DiffStatus.LeftOnly: "Μόνο αριστερά"

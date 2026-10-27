@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Kas olete kindel, et soovite „{0}“ prügikasti t
 Delete.Permanent.Title: "Kustuta jäädavalt"
 Drop.Copy: "Kopeeri siia"
 Drop.Move: "Teisalda siia"
+Drop.Shortcut: "Loo siia otsetee"
 Enum.DiffStatus.Different: "Erinev"
 Enum.DiffStatus.Identical: "Identne"
 Enum.DiffStatus.LeftOnly: "Ainult vasakul"

@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Är du säker på att du vill flytta ”{0}” till 
 Delete.Permanent.Title: "Ta bort permanent"
 Drop.Copy: "Kopiera hit"
 Drop.Move: "Flytta hit"
+Drop.Shortcut: "Skapa genväg här"
 Enum.DiffStatus.Different: "Olika"
 Enum.DiffStatus.Identical: "Identiska"
 Enum.DiffStatus.LeftOnly: "Endast till vänster"

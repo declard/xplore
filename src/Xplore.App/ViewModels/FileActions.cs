@@ -46,7 +46,7 @@ public sealed class FileActions
         PasteCommand = new AsyncRelayCommand(Paste, () => _folder.CurrentPath is not null && ClipboardHelper.HasFiles);
         PasteShortcutCommand = new AsyncRelayCommand(PasteShortcut, () => _folder.CurrentPath is not null && ClipboardHelper.HasFiles);
         CreateShortcutCommand = new AsyncRelayCommand(
-            () => _runner.RunAsync(async () => await _folder.RefreshAsync(await MakeShortcuts(SelectedPaths))),
+            () => _runner.RunAsync(async () => await _folder.RefreshAsync(await MakeShortcuts(SelectedPaths, _folder.CurrentPath!))),
             () => _folder.CurrentPath is not null && HasSelection);
         DeleteCommand = new AsyncRelayCommand(() => Delete(permanent: false), () => HasSelection);
         PermanentDeleteCommand = new AsyncRelayCommand(() => Delete(permanent: true), () => HasSelection);
@@ -87,6 +87,12 @@ public sealed class FileActions
     {
         var sources = paths.ToList();
         return _runner.RunAsync(async () => await _folder.RefreshAsync(await TransferAsync(sources, destDir, move)));
+    }
+
+    public Task DropShortcutsAsync(IEnumerable<string> paths, string destDir)
+    {
+        var sources = paths.ToList();
+        return _runner.RunAsync(async () => await _folder.RefreshAsync(await MakeShortcuts(sources, destDir)));
     }
 
     public Task SendToAsync(SendToTarget target)
@@ -138,7 +144,7 @@ public sealed class FileActions
         });
 
     private Task PasteShortcut() =>
-        _runner.RunAsync(async () => await _folder.RefreshAsync(await MakeShortcuts((await ClipboardHelper.GetFilesAsync()).Paths)));
+        _runner.RunAsync(async () => await _folder.RefreshAsync(await MakeShortcuts((await ClipboardHelper.GetFilesAsync()).Paths, _folder.CurrentPath!)));
 
     private async Task RunVerb(LocationVerb verb)
     {
@@ -186,9 +192,9 @@ public sealed class FileActions
         return [.. pairs.Select(p => p.To)];
     }
 
-    private async Task<IReadOnlyList<string>> MakeShortcuts(IReadOnlyList<string> targets)
+    private async Task<IReadOnlyList<string>> MakeShortcuts(IReadOnlyList<string> targets, string destDir)
     {
-        var links = await FileOperations.CreateShortcutsAsync(targets, _folder.CurrentPath!);
+        var links = await FileOperations.CreateShortcutsAsync(targets, destDir);
         _actions.Record(new ShortcutAction(links.Zip(targets, (l, t) => (l, t)).ToList()));
         return links;
     }

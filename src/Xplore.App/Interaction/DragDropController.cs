@@ -162,17 +162,28 @@ public sealed class DragDropController(MainWindow window)
 
     private void ShowDropMenu(TabViewModel tab, string[] sources, string dest)
     {
-        MenuItem Choice(string header, bool move, bool enabled)
+        MenuItem Choice(string header, Func<Task> run, bool enabled)
         {
             var item = new MenuItem { Header = header, IsEnabled = enabled };
-            item.Click += (_, _) => window.Dispatcher.BeginInvoke(() => tab.Files.DropAsync(sources, dest, move).Forget(), DispatcherPriority.Background);
+            item.Click += (_, _) => window.Dispatcher.BeginInvoke(() => run().Forget(), DispatcherPriority.Background);
             return item;
         }
 
         var menu = new ContextMenu { Placement = PlacementMode.MousePoint };
-        new Control[] { Choice(Loc.Get("Drop.Move"), true, CanMove(sources, dest)), Choice(Loc.Get("Drop.Copy"), false, true), new Separator(), new MenuItem { Header = Loc.Get("Common.Cancel") } }
-            .ToList()
-            .ForEach(c => menu.Items.Add(c));
+        var controls = new Control[]
+        {
+            Choice(Loc.Get("Drop.Move"), () => tab.Files.DropAsync(sources, dest, true), CanMove(sources, dest)),
+            Choice(Loc.Get("Drop.Copy"), () => tab.Files.DropAsync(sources, dest, false), true),
+            Choice(Loc.Get("Drop.Shortcut"), () => tab.Files.DropShortcutsAsync(sources, dest), true),
+            new Separator(),
+            new MenuItem { Header = Loc.Get("Common.Cancel") },
+        };
+
+        foreach (var control in controls)
+        {
+            menu.Items.Add(control);
+        }
+
         menu.IsOpen = true;
     }
 

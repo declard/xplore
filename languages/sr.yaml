@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Да ли сте сигурни да желите д
 Delete.Permanent.Title: "Трајно брисање"
 Drop.Copy: "Копирај овде"
 Drop.Move: "Премести овде"
+Drop.Shortcut: "Направи пречицу овде"
 Enum.DiffStatus.Different: "Различито"
 Enum.DiffStatus.Identical: "Идентично"
 Enum.DiffStatus.LeftOnly: "Само лево"

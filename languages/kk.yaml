@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "'{0}' элементін себетке жіберг
 Delete.Permanent.Title: "Біржола жою"
 Drop.Copy: "Осында көшіру"
 Drop.Move: "Осында жылжыту"
+Drop.Shortcut: "Осы жерде таңбаша жасау"
 Enum.DiffStatus.Different: "Әртүрлі"
 Enum.DiffStatus.Identical: "Бірдей"
 Enum.DiffStatus.LeftOnly: "Тек сол жақта"

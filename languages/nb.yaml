@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Er du sikker på at du vil flytte «{0}» til papirk
 Delete.Permanent.Title: "Slett permanent"
 Drop.Copy: "Kopier hit"
 Drop.Move: "Flytt hit"
+Drop.Shortcut: "Opprett snarvei her"
 Enum.DiffStatus.Different: "Forskjellig"
 Enum.DiffStatus.Identical: "Identisk"
 Enum.DiffStatus.LeftOnly: "Bare til venstre"

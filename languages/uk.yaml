@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Ви впевнені, що хочете перем�
 Delete.Permanent.Title: "Остаточне видалення"
 Drop.Copy: "Копіювати сюди"
 Drop.Move: "Перемістити сюди"
+Drop.Shortcut: "Створити ярлик тут"
 Enum.DiffStatus.Different: "Відмінні"
 Enum.DiffStatus.Identical: "Ідентичні"
 Enum.DiffStatus.LeftOnly: "Лише ліворуч"

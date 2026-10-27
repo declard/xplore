@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "¿Está seguro de que desea mover '{0}' a la Papeler
 Delete.Permanent.Title: "Eliminar permanentemente"
 Drop.Copy: "Copiar aquí"
 Drop.Move: "Mover aquí"
+Drop.Shortcut: "Crear acceso directo aquí"
 Enum.DiffStatus.Different: "Diferente"
 Enum.DiffStatus.Identical: "Idéntico"
 Enum.DiffStatus.LeftOnly: "Solo a la izquierda"

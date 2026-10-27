@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "ნამდვილად გსურთ '{0}'-�
 Delete.Permanent.Title: "სამუდამოდ წაშლა"
 Drop.Copy: "კოპირება აქ"
 Drop.Move: "გადატანა აქ"
+Drop.Shortcut: "მალსახმობის შექმნა აქ"
 Enum.DiffStatus.Different: "განსხვავებული"
 Enum.DiffStatus.Identical: "იდენტური"
 Enum.DiffStatus.LeftOnly: "მხოლოდ მარცხნივ"

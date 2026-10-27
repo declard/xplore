@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Tem certeza de que deseja mover “{0}” para a Lix
 Delete.Permanent.Title: "Excluir permanentemente"
 Drop.Copy: "Copiar aqui"
 Drop.Move: "Mover aqui"
+Drop.Shortcut: "Criar atalho aqui"
 Enum.DiffStatus.Different: "Diferente"
 Enum.DiffStatus.Identical: "Idêntico"
 Enum.DiffStatus.LeftOnly: "Somente à esquerda"

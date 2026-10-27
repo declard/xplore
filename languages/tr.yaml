@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "'{0}' öğesini Geri Dönüşüm Kutusu'na taşımak
 Delete.Permanent.Title: "Kalıcı olarak sil"
 Drop.Copy: "Buraya kopyala"
 Drop.Move: "Buraya taşı"
+Drop.Shortcut: "Kısayolu burada oluştur"
 Enum.DiffStatus.Different: "Farklı"
 Enum.DiffStatus.Identical: "Aynı"
 Enum.DiffStatus.LeftOnly: "Yalnızca solda"

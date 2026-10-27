@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "क्या आप वाकई '{0}' को री
 Delete.Permanent.Title: "स्थायी रूप से हटाएँ"
 Drop.Copy: "यहाँ कॉपी करें"
 Drop.Move: "यहाँ ले जाएँ"
+Drop.Shortcut: "यहाँ शॉर्टकट बनाएँ"
 Enum.DiffStatus.Different: "भिन्न"
 Enum.DiffStatus.Identical: "समान"
 Enum.DiffStatus.LeftOnly: "केवल बायाँ"

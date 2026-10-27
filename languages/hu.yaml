@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Biztosan áthelyezi a következőt a Lomtárba: „{
 Delete.Permanent.Title: "Végleges törlés"
 Drop.Copy: "Másolás ide"
 Drop.Move: "Áthelyezés ide"
+Drop.Shortcut: "Parancsikon létrehozása itt"
 Enum.DiffStatus.Different: "Különböző"
 Enum.DiffStatus.Identical: "Azonos"
 Enum.DiffStatus.LeftOnly: "Csak a bal oldalon"

@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Наистина ли искате да премес
 Delete.Permanent.Title: "Окончателно изтриване"
 Drop.Copy: "Копиране тук"
 Drop.Move: "Преместване тук"
+Drop.Shortcut: "Създаване на пряк път тук"
 Enum.DiffStatus.Different: "Различни"
 Enum.DiffStatus.Identical: "Идентични"
 Enum.DiffStatus.LeftOnly: "Само отляво"

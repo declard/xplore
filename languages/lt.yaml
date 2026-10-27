@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Ar tikrai norite perkelti „{0}“ į šiukšlinę?
 Delete.Permanent.Title: "Ištrinti visam laikui"
 Drop.Copy: "Kopijuoti čia"
 Drop.Move: "Perkelti čia"
+Drop.Shortcut: "Sukurti nuorodą čia"
 Enum.DiffStatus.Different: "Skiriasi"
 Enum.DiffStatus.Identical: "Vienodi"
 Enum.DiffStatus.LeftOnly: "Tik kairėje"

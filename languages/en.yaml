@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Are you sure you want to move '{0}' to the Recycle B
 Delete.Permanent.Title: "Delete permanently"
 Drop.Copy: "Copy here"
 Drop.Move: "Move here"
+Drop.Shortcut: "Create shortcut here"
 Enum.DiffStatus.Different: "Different"
 Enum.DiffStatus.Identical: "Identical"
 Enum.DiffStatus.LeftOnly: "Left only"

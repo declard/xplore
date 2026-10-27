@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Sigur doriți să mutați „{0}” în Coșul de re
 Delete.Permanent.Title: "Ștergere definitivă"
 Drop.Copy: "Copiere aici"
 Drop.Move: "Mutare aici"
+Drop.Shortcut: "Creează comandă rapidă aici"
 Enum.DiffStatus.Different: "Diferit"
 Enum.DiffStatus.Identical: "Identic"
 Enum.DiffStatus.LeftOnly: "Doar în stânga"

@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Haluatko varmasti siirtää kohteen '{0}' roskakorii
 Delete.Permanent.Title: "Poista pysyvästi"
 Drop.Copy: "Kopioi tähän"
 Drop.Move: "Siirrä tähän"
+Drop.Shortcut: "Luo pikakuvake tähän"
 Enum.DiffStatus.Different: "Erilainen"
 Enum.DiffStatus.Identical: "Identtinen"
 Enum.DiffStatus.LeftOnly: "Vain vasemmalla"

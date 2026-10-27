@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Vai tiešām vēlaties pārvietot “{0}” uz atkri
 Delete.Permanent.Title: "Dzēst neatgriezeniski"
 Drop.Copy: "Kopēt šeit"
 Drop.Move: "Pārvietot šeit"
+Drop.Shortcut: "Izveidot saīsni šeit"
 Enum.DiffStatus.Different: "Atšķirīgs"
 Enum.DiffStatus.Identical: "Identisks"
 Enum.DiffStatus.LeftOnly: "Tikai kreisajā pusē"

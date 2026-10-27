@@ -37,6 +37,7 @@ Delete.Confirm.RecycleOne: "Վստա՞հ եք, որ ցանկանում եք տե
 Delete.Permanent.Title: "Ջնջել ընդմիշտ"
 Drop.Copy: "Պատճենել այստեղ"
 Drop.Move: "Տեղափոխել այստեղ"
+Drop.Shortcut: "Ստեղծել դյուրանցում այստեղ"
 Enum.DiffStatus.Different: "Տարբերվում են"
 Enum.DiffStatus.Identical: "Նույնական են"
 Enum.DiffStatus.LeftOnly: "Միայն ձախում"
