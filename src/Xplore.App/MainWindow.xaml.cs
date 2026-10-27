@@ -50,7 +50,7 @@ public partial class MainWindow : Window
 
     internal TabViewModel? Tab => Main.SelectedTab;
 
-    // The close is held back until the session is written, then repeated.
+    // The close is held back until the session is written, then repeated. The repeat is queued because the save can complete synchronously, while the window is still closing, where Close() throws.
     protected override async void OnClosing(CancelEventArgs e)
     {
         if (_sessionSaved)
@@ -67,7 +67,7 @@ public partial class MainWindow : Window
         finally
         {
             _sessionSaved = true;
-            Close();
+            _ = Dispatcher.BeginInvoke(Close);
         }
     }
 
