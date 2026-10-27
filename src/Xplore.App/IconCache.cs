@@ -10,7 +10,8 @@ namespace Xplore.App;
 
 public static class IconCache
 {
-    private static readonly ConcurrentDictionary<string, ImageSource?> Cache = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, ImageSource> Cache = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Lock ShellLock = new();
     private static readonly HashSet<string> PerFileExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".exe", ".lnk", ".ico", ".scr", ".cur", ".url", ".msi",
@@ -18,7 +19,7 @@ public static class IconCache
 
     public static ImageSource? For(FsEntry e) => e switch
     {
-        { Path: RecycleBin.Location } => Cache.GetOrAdd("recycle-bin", _ => ToImage(ShellInfo.IconAt(@"%SystemRoot%\System32\imageres.dll,-54"))),
+        { Path: RecycleBin.Location } => Cached("recycle-bin", () => ToImage(ShellInfo.IconAt(@"%SystemRoot%\System32\imageres.dll,-54"))),
         { IsDirectory: true, Modified: null } => Load(e.Path, e.Path, true, true),
         { IsDirectory: true } => Folder,
         _ => PerFileExtensions.Contains(Path.GetExtension(e.Name))
@@ -29,7 +30,7 @@ public static class IconCache
     public static ImageSource? Folder => Load("dir", "folder", true, false);
 
     public static ImageSource? ForApp(OpenWithApp app) =>
-        Cache.GetOrAdd("app:" + app.Path, _ => FromLocation(app.Icon) ?? (File.Exists(app.Path) ? Load(app.Path, app.Path, false, true) : null));
+        Cached("app:" + app.Path, () => FromLocation(app.Icon) ?? (File.Exists(app.Path) ? Load(app.Path, app.Path, false, true) : null));
 
     private static ImageSource? FromLocation(string? location)
     {
@@ -55,7 +56,28 @@ public static class IconCache
     }
 
     private static ImageSource? Load(string key, string path, bool isDirectory, bool realPath) =>
-        Cache.GetOrAdd(key, _ => ToImage(ShellInfo.SmallIcon(path, isDirectory, realPath)));
+        Cached(key, () => ToImage(ShellInfo.SmallIcon(path, isDirectory, realPath)));
+
+    // Concurrent SHGetFileInfo calls for a drive root fail for all of the callers, so the lookups are serialized; failures are not cached.
+    private static ImageSource? Cached(string key, Func<ImageSource?> create)
+    {
+        if (Cache.TryGetValue(key, out var hit))
+            return hit;
+
+        lock (ShellLock)
+        {
+            if (Cache.TryGetValue(key, out hit))
+                return hit;
+
+            var image = create();
+            if (image is not null)
+            {
+                Cache[key] = image;
+            }
+
+            return image;
+        }
+    }
 
     private static ImageSource? ToImage(IntPtr handle)
     {
