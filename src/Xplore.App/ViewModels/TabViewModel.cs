@@ -217,8 +217,11 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
     {
         try
         {
-            var all = path is null ? await _fs.StorageAsync() :(await _fs.ListAsync(path)).Where(e => e.IsDirectory).ToList();
-            return [.. FsSorting.Sort(all, SortColumn.Name, true)];
+            if (path is null)
+                return await _fs.StorageAsync();
+
+            var folders = (await _fs.ListAsync(path)).Where(e => e.IsDirectory);
+            return [.. FsSorting.Sort(folders, SortColumn.Name, true)];
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -383,7 +386,8 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
     {
         var selected = select.ToHashSet(StringComparer.OrdinalIgnoreCase);
         Items.Clear();
-        foreach (var e in FsSorting.Sort(_entries, _sortColumn, _sortAscending))
+        var ordered = CurrentPath is null ? _entries : FsSorting.Sort(_entries, _sortColumn, _sortAscending);
+        foreach (var e in ordered)
         {
             Items.Add(new ItemViewModel(e) { IsSelected = selected.Contains(e.Path) });
         }

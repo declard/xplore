@@ -42,6 +42,16 @@ public class LocationProviderTests
         Assert.Equal([.. drives.Select(d => d.Path), "Recycle Bin"], storage.Select(e => e.Path));
     }
 
+    [Fact]
+    public async Task StorageOrdersDrivesByLetterAndEndsWithTheRecycleBin()
+    {
+        var paths = (await _fs.StorageAsync()).Select(e => e.Path).ToList();
+        var drives = paths[..^1];
+
+        Assert.Equal("Recycle Bin", paths[^1]);
+        Assert.Equal(drives.Order(StringComparer.OrdinalIgnoreCase), drives);
+    }
+
     [Theory]
     [InlineData("*.txt", new[] { "a.txt", "b.txt" })]
     [InlineData("a*", new[] { "a.txt", "arch" })]

@@ -147,9 +147,14 @@ public sealed class TreeNodeViewModel : ObservableObject
         var isRoot = Path is null;
         try
         {
-            var entries = isRoot ? await fs.StorageAsync() : await SubfoldersAsync(fs);
-            var probed = await Task.Run(() => FsSorting.Sort(entries, SortColumn.Name, true)
-                .Select(e => (Entry: e, Icon: IconCache.For(e), HasChildren: fs.CapabilitiesOf(e.Path).HasFlag(LocationCapabilities.Subfolders) && HasSubfolders(e.Path), Usage: isRoot ? Usage(e.Path) : null))
+            var probed = await Task.Run(async () => (isRoot
+                    ? await fs.StorageAsync()
+                    : [.. FsSorting.Sort(await SubfoldersAsync(fs), SortColumn.Name, true)])
+                .Select(e => (
+                    Entry: e,
+                    Icon: IconCache.For(e),
+                    HasChildren: fs.CapabilitiesOf(e.Path).HasFlag(LocationCapabilities.Subfolders) && HasSubfolders(e.Path),
+                    Usage: isRoot ? Usage(e.Path) : null))
                 .ToList());
 
             Children.Clear();

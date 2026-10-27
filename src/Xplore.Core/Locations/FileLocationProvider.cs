@@ -30,6 +30,7 @@ public sealed class FileLocationProvider : ILocationProvider
         Task.Run<IReadOnlyList<FsEntry>>(() =>
             DriveInfo.GetDrives()
                 .Where(d => d.IsReady)
+                .OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase)
                 .Select(d => new FsEntry(d.Name, DriveLabel(d), true, null, null, Loc.Get("Type.LocalDisk")))
                 .ToList(), ct);
 
