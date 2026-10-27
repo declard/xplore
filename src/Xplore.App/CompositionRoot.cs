@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Xplore.App.ViewModels;
 using Xplore.Core.Localization;
 using Xplore.Core.Locations;
@@ -6,26 +7,36 @@ using Xplore.Core.Settings;
 
 namespace Xplore.App;
 
-// The one place where the application's services are created and wired together.
+// The one place where the application's services are registered. What needs the disk is loaded first so that the container itself is built synchronously.
 public static class CompositionRoot
 {
-    public static async Task<MainViewModel> CreateAsync()
+    public static async Task<ServiceProvider> BuildAsync()
     {
         var settings = new SettingsService();
         await settings.ReloadAsync();
         Loc.Apply(settings.Current.Language);
 
-        var format = new PathFormat(settings);
-        var prompts = new WpfPrompts();
-        var fs = new FileSystemService(new FileLocationProvider(), [new RecycleBinLocationProvider()]);
         var bookmarks = await BookmarkStore.LoadAsync(new BookmarkRegistry(AppFolder.File("bookmarks.yaml")));
-        var openWith = new OpenWithStore(new OpenWithRegistry(AppFolder.File("openWith.yaml")));
-        var history = new ActionHistoryStore(prompts, settings, format);
-        var tabs = new TabFactory(fs, prompts, bookmarks, history, openWith, settings, format);
-
         var sessions = new SessionStore(AppFolder.File("session.yaml"));
         var session = settings.Current.StartLocation?.Type == StartMode.Restore ? await sessions.LoadAsync() : null;
         var start = await Task.Run(() => StartTabs.Resolve(settings.Current, session));
-        return new(settings, format, history, tabs, sessions, start);
+
+        return new ServiceCollection()
+            .AddSingleton<ISettings>(settings)
+            .AddSingleton(bookmarks)
+            .AddSingleton(sessions)
+            .AddSingleton(start)
+            .AddSingleton(new OpenWithRegistry(AppFolder.File("openWith.yaml")))
+            .AddSingleton<PathFormat>()
+            .AddSingleton<IUserPrompts, WpfPrompts>()
+            .AddSingleton<FileLocationProvider>()
+            .AddSingleton<ILocationProvider, RecycleBinLocationProvider>()
+            .AddSingleton<IFileSystemService, FileSystemService>()
+            .AddSingleton<OpenWithStore>()
+            .AddSingleton<ActionHistoryStore>()
+            .AddSingleton<TabFactory>()
+            .AddSingleton<MainViewModel>()
+            .AddSingleton<MainWindow>()
+            .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
     }
 }

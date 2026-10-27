@@ -1,21 +1,28 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Markup;
+using Microsoft.Extensions.DependencyInjection;
 using Xplore.Core.Localization;
-using Xplore.App.ViewModels;
 
 namespace Xplore.App;
 
 public partial class App : Application
 {
+    private ServiceProvider? _services;
+
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        var viewModel = await CompositionRoot.CreateAsync();
+        _services = await CompositionRoot.BuildAsync();
         var language = XmlLanguage.GetLanguage((Loc.Culture ?? CultureInfo.CurrentUICulture).IetfLanguageTag);
         FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(language));
-        MainWindow = new MainWindow(viewModel);
+        MainWindow = _services.GetRequiredService<MainWindow>();
         MainWindow.Show();
     }
-}
 
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _services?.Dispose();
+        base.OnExit(e);
+    }
+}
