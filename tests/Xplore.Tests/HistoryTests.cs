@@ -11,7 +11,7 @@ public class ActionHistoryTests
         public bool Undoable => undoable;
         public Task UndoAsync() { if (failUndo) throw new IOException(); log.Add("-" + name); return Task.CompletedTask; }
         public Task RedoAsync() { log.Add("+" + name); return Task.CompletedTask; }
-        public string Describe(bool extended) => name;
+        public string Describe(bool extended, PathFormat format) => name;
     }
 
     private readonly List<string> _log = [];
@@ -118,6 +118,7 @@ public class ActionHistoryTests
 public class HistoryActionTests : IDisposable
 {
     private readonly string _dir = Directory.CreateTempSubdirectory().FullName;
+    private static readonly PathFormat Format = new(new FakeSettings(AppSettings.Default));
     public void Dispose() => Directory.Delete(_dir, true);
 
     private string P(string name) => Path.Combine(_dir, name);
@@ -165,7 +166,7 @@ public class HistoryActionTests : IDisposable
     {
         var pairs = Enumerable.Range(1, 5).Select(i => (P($"{i}.txt"), Path.Combine(_dir, "dest", $"{i}.txt"))).ToList();
         var action = new Xplore.Core.History.MoveAction(pairs);
-        Assert.Equal($"Moved 5 files: \"1.txt\", \"2.txt\", \"3.txt\", ...\nfrom \"{_dir}\"\nto \"{Path.Combine(_dir, "dest")}\"", action.Describe(false));
+        Assert.Equal($"Moved 5 files: \"1.txt\", \"2.txt\", \"3.txt\", ...\nfrom \"{_dir}\"\nto \"{Path.Combine(_dir, "dest")}\"", action.Describe(false, Format));
     }
 
     [Fact]
@@ -181,7 +182,7 @@ public class HistoryActionTests : IDisposable
     public void RenameDescription()
     {
         var action = new Xplore.Core.History.RenameAction(P("a.txt"), P("b.txt"));
-        Assert.Equal($"Renamed\nold name \"a.txt\"\nnew name \"b.txt\"\nlocation \"{_dir}\"", action.Describe(false));
+        Assert.Equal($"Renamed\nold name \"a.txt\"\nnew name \"b.txt\"\nlocation \"{_dir}\"", action.Describe(false, Format));
     }
 }
 
@@ -192,20 +193,8 @@ public class SettingsTests
         Assert.Equal(100, Xplore.Core.Settings.Yaml.Reader.Deserialize<AppSettings>("ForwardSlashes: false")!.HistoryDepth);
 }
 
-public class PathFormatAndOpenWithTests
+public class OpenWithTests
 {
-    [Fact]
-    public void ForwardSlashesAreAppliedOnlyWhenEnabled()
-    {
-        try
-        {
-            Assert.Equal(@"C:\a\b", PathFormat.Show(@"C:\a\b"));
-            PathFormat.ForwardSlashes = true;
-            Assert.Equal("C:/a/b", PathFormat.Show(@"C:\a\b"));
-        }
-        finally { PathFormat.ForwardSlashes = false; }
-    }
-
     [Theory]
     [InlineData(@"C:\x\Readme.TXT", ".txt")]
     [InlineData(@"C:\x\.gitignore", ".gitignore")]

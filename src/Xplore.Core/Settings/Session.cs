@@ -28,7 +28,7 @@ public sealed record StartTabs(IReadOnlyList<string?> Locations, int Selected)
 
 public static class SessionStore
 {
-    public static string FilePath { get; } = Path.Combine(Path.GetDirectoryName(SettingsStore.FilePath)!, "session.yaml");
+    public static string FilePath { get; } = AppFolder.File("session.yaml");
 
     public static Task<Session?> LoadAsync() => YamlFile.ReadAsync<Session>(FilePath);
 

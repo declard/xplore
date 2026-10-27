@@ -157,7 +157,7 @@ Settings.NewFolderPrompt: "नया फ़ोल्डर बनाते स�
 Settings.FoldersFirst: "फ़ोल्डर फ़ाइलों से पहले दिखाएँ"
 Settings.OpenFile: "सेटिंग फ़ाइल खोलें"
 Settings.PrefixTimeout: "टाइप करके खोजने में विराम"
-Settings.RestartNote: "भाषा, पथ विभाजक, पूर्ववत इतिहास की गहराई और प्रारंभ स्थान पुनः आरंभ करने के बाद लागू होते हैं."
+Settings.RestartNote: "भाषा, पूर्ववत इतिहास की गहराई और प्रारंभ स्थान पुनः आरंभ करने के बाद लागू होते हैं."
 Settings.StartLocation: "स्टार्टअप पर खोलें"
 Settings.Title: "सेटिंग"
 Size.Kb: "{0:N0} KB"

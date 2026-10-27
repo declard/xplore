@@ -11,13 +11,15 @@ public sealed class AddressBar : ObservableObject
 {
     private readonly IFileSystemService _fs;
     private readonly IUserPrompts _prompts;
+    private readonly PathFormat _format;
     private readonly Func<string?> _currentPath;
     private readonly Func<string?, Task> _navigate;
 
-    public AddressBar(IFileSystemService fs, IUserPrompts prompts, Func<string?> currentPath, Func<string?, Task> navigate)
+    public AddressBar(IFileSystemService fs, IUserPrompts prompts, PathFormat format, Func<string?> currentPath, Func<string?, Task> navigate)
     {
         _fs = fs;
         _prompts = prompts;
+        _format = format;
         _currentPath = currentPath;
         _navigate = navigate;
         NavigateCommand = new AsyncRelayCommand(() => NavigateToText(Text));
@@ -37,7 +39,7 @@ public sealed class AddressBar : ObservableObject
         set => Set(ref field, value);
     } = [];
 
-    public void Reset(string? path) => Text = PathFormat.Show(path ?? TabViewModel.RootName);
+    public void Reset(string? path) => Text = _format.Show(path ?? TabViewModel.RootName);
 
     public async Task<IReadOnlyList<Crumb>> BuildCrumbsAsync(string? path, CancellationToken ct)
     {

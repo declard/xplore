@@ -40,23 +40,24 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
     private List<FsEntry> _entries = [];
     private SortColumn _sortColumn = SortColumn.Name;
     private bool _sortAscending = true;
-    private bool _foldersFirst = true;
+    private readonly ISettings _settings;
     private IReadOnlyList<ItemViewModel> _selection = [];
     private readonly Subject<ShowRequest> _requests = new();
     private readonly IDisposable _showing;
     private int _loading;
 
-    public TabViewModel(IFileSystemService fs, IUserPrompts prompts, BookmarkStore bookmarks, ActionHistoryStore actions, string? location = null)
+    public TabViewModel(IFileSystemService fs, IUserPrompts prompts, BookmarkStore bookmarks, ActionHistoryStore actions, ISettings settings, PathFormat format, string? location = null)
     {
         _fs = fs;
         _prompts = prompts;
         _bookmarks = bookmarks;
+        _settings = settings;
         _runner = new OperationRunner(prompts);
-        Terminal = new ConsoleViewModel(() => PathWith(LocationCapabilities.Console), () => SelectedPaths);
+        Terminal = new ConsoleViewModel(format, () => PathWith(LocationCapabilities.Console), () => SelectedPaths);
         Tree = new FolderTree(fs, bookmarks, () => CurrentPath, NavigateToAsync);
-        Address = new AddressBar(fs, prompts, () => CurrentPath, NavigateToAsync);
+        Address = new AddressBar(fs, prompts, format, () => CurrentPath, NavigateToAsync);
         Search = new FolderSearch(fs, prompts, () => CurrentPath, () => ShowAsync(_history));
-        Files = new FileActions(this, prompts, actions, _runner);
+        Files = new FileActions(this, prompts, actions, _runner, settings, format);
         OpenWith = new OpenWithService(prompts, _runner, () => _selection);
         _watcher.Elapsed += () => RefreshFromWatcherAsync().Forget();
         Search.Started += OnSearchStarted;
@@ -316,8 +317,6 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
         var changedFolder = target.Current != CurrentPath;
         _history = target;
         _entries = entries;
-        _foldersFirst = (await SettingsStore.LoadAsync()).FoldersFirst;
-        ct.ThrowIfCancellationRequested();
         Address.Reset(target.Current);
         Rebuild(request.Select ?? []);
         if (changedFolder || !_watcher.IsWatching)
@@ -390,7 +389,7 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
     {
         var selected = select.ToHashSet(StringComparer.OrdinalIgnoreCase);
         Items.Clear();
-        var ordered = CurrentPath is null ? _entries : new FsSorting(_foldersFirst).Sort(_entries, _sortColumn, _sortAscending);
+        var ordered = CurrentPath is null ? _entries : new FsSorting(_settings.Current.FoldersFirst).Sort(_entries, _sortColumn, _sortAscending);
         foreach (var e in ordered)
         {
             Items.Add(new ItemViewModel(e) { IsSelected = selected.Contains(e.Path) });

@@ -1,5 +1,6 @@
 using Xplore.Core.Localization;
 using Xplore.Core.History;
+using Xplore.Core.Settings;
 
 namespace Xplore.App;
 
@@ -8,11 +9,13 @@ public sealed class ActionHistoryStore : ObservableObject
 {
     private readonly ActionHistory _history;
     private readonly IUserPrompts _prompts;
+    private readonly PathFormat _format;
 
-    public ActionHistoryStore(IUserPrompts prompts, int depth)
+    public ActionHistoryStore(IUserPrompts prompts, ISettings settings, PathFormat format)
     {
         _prompts = prompts;
-        _history = new ActionHistory(depth);
+        _format = format;
+        _history = new ActionHistory(settings.Current.HistoryDepth);
         _history.Changed += () => OnPropertyChanged(nameof(Roots));
     }
 
@@ -49,5 +52,5 @@ public sealed class ActionHistoryStore : ObservableObject
     }
 
     private HistoryNodeViewModel Wrap(HistoryNode node) =>
-        new(node, node == _history.Current, node.Children.Select(Wrap).ToList());
+        new(node, _format, node == _history.Current, node.Children.Select(Wrap).ToList());
 }

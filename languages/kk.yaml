@@ -157,7 +157,7 @@ Settings.NewFolderPrompt: "Жаңа қалта жасағанда атын сұ�
 Settings.FoldersFirst: "Қалталарды файлдардан бұрын көрсету"
 Settings.OpenFile: "Параметрлер файлын ашу"
 Settings.PrefixTimeout: "Теру кідірісі"
-Settings.RestartNote: "Тіл, жол бөлгіштері, болдырмау тарихының тереңдігі және іске қосу орны қайта іске қосқаннан кейін қолданылады."
+Settings.RestartNote: "Тіл, болдырмау тарихының тереңдігі және іске қосу орны қайта іске қосқаннан кейін қолданылады."
 Settings.StartLocation: "Іске қосқанда ашу"
 Settings.Title: "Параметрлер"
 Size.Kb: "{0:N0} КБ"

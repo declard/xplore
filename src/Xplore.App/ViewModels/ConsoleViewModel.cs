@@ -14,6 +14,7 @@ public sealed partial class ConsoleViewModel : ObservableObject, IDisposable
 {
     private const int MaxOutputLength = 400_000;
 
+    private readonly PathFormat _format;
     private readonly Func<string?> _location;
     private readonly Func<IReadOnlyList<string>> _selection;
     private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
@@ -24,9 +25,9 @@ public sealed partial class ConsoleViewModel : ObservableObject, IDisposable
     private readonly PowerShellSession _session;
     private bool _disposed;
 
-    public ConsoleViewModel(Func<string?> location, Func<IReadOnlyList<string>> selection)
+    public ConsoleViewModel(PathFormat format, Func<string?> location, Func<IReadOnlyList<string>> selection)
     {
-        (_location, _selection) = (location, selection);
+        (_format, _location, _selection) = (format, location, selection);
         _session = new PowerShellSession(_dispatcher);
         _session.Line += Append;
         _session.CommandFinished += () => IsRunning = false;
@@ -115,7 +116,7 @@ public sealed partial class ConsoleViewModel : ObservableObject, IDisposable
         IsRunning = true;
         try
         {
-            _session.Send(directory, command, _selection().Select(PathFormat.Show));
+            _session.Send(directory, command, _selection().Select(_format.Show));
         }
         catch (IOException)
         {

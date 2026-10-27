@@ -43,6 +43,7 @@ public partial class MainWindow : Window
         };
         _details.WatchTab();
         Loaded += (_, _) => _details.UpdateSortIndicators();
+        Activated += (_, _) => Main.Settings.ReloadAsync().Forget();
     }
 
     internal MainViewModel Main => (MainViewModel)DataContext;
@@ -325,18 +326,16 @@ public partial class MainWindow : Window
     {
         try
         {
-            var settings = await SettingsStore.LoadAsync();
-            var window = new SettingsWindow(settings) { Owner = this };
+            var window = new SettingsWindow(Main.Settings.Current) { Owner = this };
             if (window.ShowDialog() == true)
             {
-                await SettingsStore.SaveAsync(window.Result);
-                Tab?.RefreshCommand.Execute(null);
+                await Main.Settings.SaveAsync(window.Result);
                 return;
             }
 
             if (window.OpenFile)
             {
-                await OpenSettingsFileAsync(settings);
+                await OpenSettingsFileAsync();
             }
         }
         catch (Exception ex) when (ex is Win32Exception or IOException)
@@ -345,20 +344,21 @@ public partial class MainWindow : Window
         }
     }
 
-    private static async Task OpenSettingsFileAsync(AppSettings settings)
+    private async Task OpenSettingsFileAsync()
     {
-        if (!File.Exists(SettingsStore.FilePath))
+        var path = Main.Settings.FilePath;
+        if (!File.Exists(path))
         {
-            await SettingsStore.SaveAsync(settings);
+            await Main.Settings.SaveAsync(Main.Settings.Current);
         }
 
         try
         {
-            Process.Start(new ProcessStartInfo(SettingsStore.FilePath) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
         }
         catch (Win32Exception)
         {
-            Process.Start("notepad.exe", $"\"{SettingsStore.FilePath}\"");
+            Process.Start("notepad.exe", $"\"{path}\"");
         }
     }
 

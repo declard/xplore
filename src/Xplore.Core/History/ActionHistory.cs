@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Xplore.Core.Settings;
 
 namespace Xplore.Core.History;
 
@@ -10,7 +11,7 @@ public interface IHistoryAction
     bool Undoable { get; }
     Task UndoAsync();
     Task RedoAsync();
-    string Describe(bool extended);
+    string Describe(bool extended, PathFormat format);
 }
 
 // A node of the action history tree. Action: null for the hidden root; Children: ordered, the last one is the rightmost; Failed: replaying it threw.

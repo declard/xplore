@@ -157,7 +157,7 @@ Settings.NewFolderPrompt: "Beim Erstellen eines neuen Ordners nach dem Namen fra
 Settings.FoldersFirst: "Ordner vor Dateien anzeigen"
 Settings.OpenFile: "Einstellungsdatei öffnen"
 Settings.PrefixTimeout: "Pause bei der Tippsuche"
-Settings.RestartNote: "Sprache, Pfadtrennzeichen, Tiefe des Rückgängig-Verlaufs und Startort werden nach einem Neustart übernommen."
+Settings.RestartNote: "Sprache, Tiefe des Rückgängig-Verlaufs und Startort werden nach einem Neustart übernommen."
 Settings.StartLocation: "Beim Start öffnen"
 Settings.Title: "Einstellungen"
 Size.Kb: "{0:N0} KB"

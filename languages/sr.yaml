@@ -157,7 +157,7 @@ Settings.NewFolderPrompt: "Затражи назив при прављењу н�
 Settings.FoldersFirst: "Прикажи фасцикле пре датотека"
 Settings.OpenFile: "Отвори датотеку са подешавањима"
 Settings.PrefixTimeout: "Пауза при куцању"
-Settings.RestartNote: "Језик, раздвајачи путање, дубина историје опозива и почетна локација примењују се након поновног покретања."
+Settings.RestartNote: "Језик, дубина историје опозива и почетна локација примењују се након поновног покретања."
 Settings.StartLocation: "Отвори при покретању"
 Settings.Title: "Подешавања"
 Size.Kb: "{0:N0} KB"

@@ -157,7 +157,7 @@ Settings.NewFolderPrompt: "Ερώτηση για το όνομα κατά τη �
 Settings.FoldersFirst: "Εμφάνιση φακέλων πριν από τα αρχεία"
 Settings.OpenFile: "Άνοιγμα του αρχείου ρυθμίσεων"
 Settings.PrefixTimeout: "Παύση πληκτρολόγησης για αναζήτηση"
-Settings.RestartNote: "Η γλώσσα, οι διαχωριστές διαδρομών, το βάθος ιστορικού αναίρεσης και η αρχική θέση ισχύουν μετά από επανεκκίνηση."
+Settings.RestartNote: "Η γλώσσα, το βάθος ιστορικού αναίρεσης και η αρχική θέση ισχύουν μετά από επανεκκίνηση."
 Settings.StartLocation: "Άνοιγμα κατά την εκκίνηση"
 Settings.Title: "Ρυθμίσεις"
 Size.Kb: "{0:N0} KB"

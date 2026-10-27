@@ -47,20 +47,3 @@ public sealed record AppSettings(
 
     public static AppSettings Default { get; } = new();
 }
-
-public static class PathFormat
-{
-    public static bool ForwardSlashes { get; set; }
-
-    public static string Show(string path) => ForwardSlashes ? path.Replace('\\', '/') : path;
-}
-
-public static class SettingsStore
-{
-    public static string FilePath { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Xplore", "settings.yaml");
-
-    public static async Task<AppSettings> LoadAsync() => await YamlFile.ReadAsync<AppSettings>(FilePath) ?? AppSettings.Default;
-
-    public static Task SaveAsync(AppSettings settings) => YamlFile.WriteAsync(FilePath, settings);
-}

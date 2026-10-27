@@ -157,7 +157,7 @@ Settings.NewFolderPrompt: "ახალი საქაღალდის შე
 Settings.FoldersFirst: "საქაღალდეების ჩვენება ფაილებამდე"
 Settings.OpenFile: "პარამეტრების ფაილის გახსნა"
 Settings.PrefixTimeout: "აკრეფით ძიების პაუზა"
-Settings.RestartNote: "ენა, ბილიკების გამყოფები, გაუქმების ისტორიის სიღრმე და გაშვების მდებარეობა ძალაში შევა გადატვირთვის შემდეგ."
+Settings.RestartNote: "ენა, გაუქმების ისტორიის სიღრმე და გაშვების მდებარეობა ძალაში შევა გადატვირთვის შემდეგ."
 Settings.StartLocation: "გაშვებისას გახსნა"
 Settings.Title: "პარამეტრები"
 Size.Kb: "{0:N0} კბ"

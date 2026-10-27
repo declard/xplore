@@ -16,14 +16,16 @@ public sealed class MainViewModel : ObservableObject
     private readonly BookmarkStore _bookmarks;
     private readonly ActionHistoryStore _history;
 
-    private MainViewModel(AppSettings settings, BookmarkStore bookmarks, StartTabs start)
+    private MainViewModel(ISettings settings, BookmarkStore bookmarks, StartTabs start)
     {
-        PathFormat.ForwardSlashes = settings.ForwardSlashes;
+        Settings = settings;
+        PathFormat = new(settings);
         _bookmarks = bookmarks;
-        _history = new ActionHistoryStore(_prompts, settings.HistoryDepth)
+        _history = new ActionHistoryStore(_prompts, settings, PathFormat)
         {
             FilesChanged = ReloadAllTabsAsync
         };
+        settings.Changed += _ => ReloadAllTabsAsync().Forget();
         UndoCommand = new AsyncRelayCommand(_history.UndoAsync);
         RedoCommand = new AsyncRelayCommand(_history.RedoAsync);
         NewTabCommand = new RelayCommand(() => NewTab());
@@ -34,13 +36,16 @@ public sealed class MainViewModel : ObservableObject
 
     public static async Task<MainViewModel> CreateAsync()
     {
-        var settings = await SettingsStore.LoadAsync();
-        Loc.Apply(settings.Language);
+        var settings = new SettingsService();
+        await settings.ReloadAsync();
+        Loc.Apply(settings.Current.Language);
         var bookmarks = await BookmarkStore.LoadAsync();
-        var session = settings.StartLocation?.Type == StartMode.Restore ? await SessionStore.LoadAsync() : null;
-        return new(settings, bookmarks, await Task.Run(() => StartTabs.Resolve(settings, session)));
+        var session = settings.Current.StartLocation?.Type == StartMode.Restore ? await SessionStore.LoadAsync() : null;
+        return new(settings, bookmarks, await Task.Run(() => StartTabs.Resolve(settings.Current, session)));
     }
 
+    public ISettings Settings { get; }
+    public PathFormat PathFormat { get; }
     public ObservableCollection<TabViewModel> Tabs { get; } = [];
     public ActionHistoryStore History => _history;
     public ICommand UndoCommand { get; }
@@ -65,8 +70,7 @@ public sealed class MainViewModel : ObservableObject
 
     public async Task SaveSessionAsync()
     {
-        var settings = await SettingsStore.LoadAsync();
-        if (settings.StartLocation?.Type != StartMode.Restore)
+        if (Settings.Current.StartLocation?.Type != StartMode.Restore)
             return;
 
         await SessionStore.SaveAsync(Session.Of(Tabs.Select(t => t.CurrentPath), Tabs.IndexOf(SelectedTab!)));
@@ -74,7 +78,7 @@ public sealed class MainViewModel : ObservableObject
 
     private void NewTab(string? location = null, bool select = true)
     {
-        var tab = new TabViewModel(_fs, _prompts, _bookmarks, _history, location);
+        var tab = new TabViewModel(_fs, _prompts, _bookmarks, _history, Settings, PathFormat, location);
         Tabs.Add(tab);
         if (select)
         {

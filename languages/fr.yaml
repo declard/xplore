@@ -157,7 +157,7 @@ Settings.NewFolderPrompt: "Demander le nom lors de la création d'un nouveau dos
 Settings.FoldersFirst: "Afficher les dossiers avant les fichiers"
 Settings.OpenFile: "Ouvrir le fichier de paramètres"
 Settings.PrefixTimeout: "Pause de recherche à la frappe"
-Settings.RestartNote: "La langue, les séparateurs de chemin, la profondeur de l'historique d'annulation et l'emplacement de démarrage s'appliquent après un redémarrage."
+Settings.RestartNote: "La langue, la profondeur de l'historique d'annulation et l'emplacement de démarrage s'appliquent après un redémarrage."
 Settings.StartLocation: "Ouvrir au démarrage"
 Settings.Title: "Paramètres"
 Size.Kb: "{0:N0} Ko"

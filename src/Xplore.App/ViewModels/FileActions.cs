@@ -28,13 +28,17 @@ public sealed class FileActions
     private readonly IUserPrompts _prompts;
     private readonly ActionHistoryStore _actions;
     private readonly OperationRunner _runner;
+    private readonly ISettings _settings;
+    private readonly PathFormat _format;
 
-    public FileActions(IFolderContext folder, IUserPrompts prompts, ActionHistoryStore actions, OperationRunner runner)
+    public FileActions(IFolderContext folder, IUserPrompts prompts, ActionHistoryStore actions, OperationRunner runner, ISettings settings, PathFormat format)
     {
         _folder = folder;
         _prompts = prompts;
         _actions = actions;
         _runner = runner;
+        _settings = settings;
+        _format = format;
         CopyLocationCommand = new AsyncRelayCommand(() => ClipboardHelper.SetTextAsync(Quote(_folder.CurrentPath!)), () => _folder.CurrentPath is not null);
         CutCommand = new AsyncRelayCommand(() => ClipboardHelper.SetFilesAsync(SelectedPaths, cut: true), () => HasSelection && _folder.ItemsEditable);
         CopyCommand = new AsyncRelayCommand(() => ClipboardHelper.SetFilesAsync(SelectedPaths, cut: false), () => HasSelection && _folder.ItemsEditable);
@@ -118,7 +122,7 @@ public sealed class FileActions
         RenameStarted?.Invoke(item);
     }
 
-    private static string Quote(string path) => $"\"{PathFormat.Show(path)}\"";
+    private string Quote(string path) => $"\"{_format.Show(path)}\"";
 
     private Task Paste() =>
         _runner.RunAsync(async () =>
@@ -191,7 +195,7 @@ public sealed class FileActions
 
     private async Task NewFolder()
     {
-        if (!(await SettingsStore.LoadAsync()).NewFolderPrompt)
+        if (!_settings.Current.NewFolderPrompt)
         {
             await CreateNew(FileOperations.CreateFolderAsync, isFolder: true);
             return;

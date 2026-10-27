@@ -139,8 +139,8 @@ public sealed class DragDropController(MainWindow window)
     private static bool CanMove(string[] sources, string destDir) =>
         CanDrop(sources, destDir) && !sources.All(s => FileOperations.SameParent(s, destDir));
 
-    private static string ShellQuote(string path) =>
-        PathFormat.Show(path) is var p && p.Any(c => char.IsWhiteSpace(c) || "'\"`$&;(){}[],@#".Contains(c)) ? $"'{p.Replace("'", "''")}'" : p;
+    private string ShellQuote(string path) =>
+        window.Main.PathFormat.Show(path) is var p && p.Any(c => char.IsWhiteSpace(c) || "'\"`$&;(){}[],@#".Contains(c)) ? $"'{p.Replace("'", "''")}'" : p;
 
     private DragDropEffects EffectFor(string[] sources, string? destDir, DragEventArgs e)
     {

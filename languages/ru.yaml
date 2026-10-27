@@ -157,7 +157,7 @@ Settings.NewFolderPrompt: "Запрашивать имя при создании
 Settings.FoldersFirst: "Показывать папки перед файлами"
 Settings.OpenFile: "Открыть файл параметров"
 Settings.PrefixTimeout: "Пауза при наборе текста"
-Settings.RestartNote: "Язык, разделители путей, глубина истории отмены и начальное расположение применяются после перезапуска."
+Settings.RestartNote: "Язык, глубина истории отмены и начальное расположение применяются после перезапуска."
 Settings.StartLocation: "Открывать при запуске"
 Settings.Title: "Параметры"
 Size.Kb: "{0:N0} КБ"

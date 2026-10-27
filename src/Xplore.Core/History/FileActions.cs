@@ -13,7 +13,7 @@ internal static class Text
 
     public static string Quoted(string text) => Loc.Format("History.Quoted", text);
 
-    public static string Dir(string path) => PathFormat.Show(Path.GetDirectoryName(path.TrimEnd('\\')) ?? path);
+    public static string Dir(string path, PathFormat format) => format.Show(Path.GetDirectoryName(path.TrimEnd('\\')) ?? path);
 
     public static string Noun(IReadOnlyCollection<bool> isDirectory) => (isDirectory.Count, isDirectory.All(d => d), isDirectory.Any(d => d)) switch
     {
@@ -37,8 +37,8 @@ internal static class Text
         return string.Join(", ", names.Take(Preview)) + more;
     }
 
-    public static string Dirs(IEnumerable<string> paths) =>
-        string.Join(", ", paths.Select(Dir).Distinct(StringComparer.OrdinalIgnoreCase).Select(Quoted));
+    public static string Dirs(IEnumerable<string> items, PathFormat format) =>
+        string.Join(", ", items.Select(p => Dir(p, format)).Distinct(StringComparer.OrdinalIgnoreCase).Select(Quoted));
 
     public static string Summary(string past, IReadOnlyList<string> paths, string noun, bool extended)
     {
@@ -49,15 +49,15 @@ internal static class Text
         return Loc.Format("History.Summary.Many", past, paths.Count, noun, separator + Names(paths, extended));
     }
 
-    public static string Moves(string summary, IReadOnlyList<(string From, string To)> pairs) =>
-        string.Join("\n", summary, Loc.Format("History.From", Dirs(pairs.Select(p => p.From))), Loc.Format("History.To", Dirs(pairs.Select(p => p.To))));
+    public static string Moves(string summary, IReadOnlyList<(string From, string To)> pairs, PathFormat format) =>
+        string.Join("\n", summary, Loc.Format("History.From", Dirs(pairs.Select(p => p.From), format)), Loc.Format("History.To", Dirs(pairs.Select(p => p.To), format)));
 
-    public static string Linked(string summary, IReadOnlyList<(string Link, string Target)> links) =>
-        string.Join("\n", summary, Loc.Format("History.Location", Dirs(links.Select(l => l.Link))), Loc.Format("History.Targets", string.Join(", ", links.Select(l => Quoted(PathFormat.Show(l.Target))))));
+    public static string Linked(string summary, IReadOnlyList<(string Link, string Target)> links, PathFormat format) =>
+        string.Join("\n", summary, Loc.Format("History.Location", Dirs(links.Select(l => l.Link), format)), Loc.Format("History.Targets", string.Join(", ", links.Select(l => Quoted(format.Show(l.Target))))));
 
-    public static string Deleted(string summary, IReadOnlyList<string> paths, bool permanent)
+    public static string Deleted(string summary, IReadOnlyList<string> paths, bool permanent, PathFormat format)
     {
-        var text = string.Join("\n", summary, Loc.Format("History.From", Dirs(paths)));
+        var text = string.Join("\n", summary, Loc.Format("History.From", Dirs(paths, format)));
         if (!permanent)
             return text;
 
@@ -85,8 +85,8 @@ public sealed class MoveAction(IReadOnlyList<(string From, string To)> pairs) : 
 
     public Task RedoAsync() => Apply(pairs);
 
-    public string Describe(bool extended) =>
-        Text.Moves(Text.Summary(Loc.Get("Verb.Moved"), pairs.Select(p => p.From).ToList(), _noun, extended), pairs);
+    public string Describe(bool extended, PathFormat format) =>
+        Text.Moves(Text.Summary(Loc.Get("Verb.Moved"), pairs.Select(p => p.From).ToList(), _noun, extended), pairs, format);
 
     private static Task Apply(IEnumerable<(string From, string To)> steps) =>
         Task.Run(() => steps.ToList().ForEach(s =>
@@ -120,8 +120,8 @@ public sealed class CopyAction(IReadOnlyList<(string From, string To)> pairs) : 
             FileOperations.Copy(p.From, p.To);
         }));
 
-    public string Describe(bool extended) =>
-        Text.Moves(Text.Summary(Loc.Get("Verb.Copied"), pairs.Select(p => p.From).ToList(), _noun, extended), pairs);
+    public string Describe(bool extended, PathFormat format) =>
+        Text.Moves(Text.Summary(Loc.Get("Verb.Copied"), pairs.Select(p => p.From).ToList(), _noun, extended), pairs, format);
 }
 
 // Rename: OldPath and NewPath: the full path before and after.
@@ -134,8 +134,8 @@ public sealed class RenameAction(string oldPath, string newPath) : IHistoryActio
 
     public Task RedoAsync() => FileOperations.RenameAsync(oldPath, Text.Name(newPath));
 
-    public string Describe(bool extended) =>
-        Loc.Format("History.Renamed.Details", Text.Name(oldPath), Text.Name(newPath), Text.Dir(oldPath));
+    public string Describe(bool extended, PathFormat format) =>
+        Loc.Format("History.Renamed.Details", Text.Name(oldPath), Text.Name(newPath), Text.Dir(oldPath, format));
 }
 
 // New file or folder: Path: the created item.
@@ -164,8 +164,8 @@ public sealed class CreateAction(string path, bool isFolder) : IHistoryAction
             File.Create(path).Dispose();
         });
 
-    public string Describe(bool extended) =>
-        Loc.Format(isFolder ? "History.CreatedFolder.Details" : "History.CreatedFile.Details", Text.Name(path), Text.Dir(path));
+    public string Describe(bool extended, PathFormat format) =>
+        Loc.Format(isFolder ? "History.CreatedFolder.Details" : "History.CreatedFile.Details", Text.Name(path), Text.Dir(path, format));
 }
 
 // Create shortcut: Links: each shortcut file and the target it points to.
@@ -188,8 +188,8 @@ public sealed class ShortcutAction(IReadOnlyList<(string Link, string Target)> l
             Shortcuts.Create(l.Link, l.Target);
         }));
 
-    public string Describe(bool extended) =>
-        Text.Linked(Text.Summary(Loc.Get("Verb.Created"), links.Select(l => l.Link).ToList(), Loc.Get(links.Count == 1 ? "Noun.Shortcut" : "Noun.Shortcuts"), extended), links);
+    public string Describe(bool extended, PathFormat format) =>
+        Text.Linked(Text.Summary(Loc.Get("Verb.Created"), links.Select(l => l.Link).ToList(), Loc.Get(links.Count == 1 ? "Noun.Shortcut" : "Noun.Shortcuts"), extended), links, format);
 }
 
 // Delete: Paths: the deleted items; IsDirectory: what each was; Permanent: bypassed the Recycle Bin, so it cannot be undone.
@@ -214,6 +214,6 @@ public sealed class DeleteAction(IReadOnlyList<string> paths, IReadOnlyList<bool
             FileOperations.Delete(paths);
         });
 
-    public string Describe(bool extended) =>
-        Text.Deleted(Text.Summary(Loc.Get(permanent ? "Verb.PermanentlyDeleted" : "Verb.Deleted"), paths, _noun, extended), paths, permanent);
+    public string Describe(bool extended, PathFormat format) =>
+        Text.Deleted(Text.Summary(Loc.Get(permanent ? "Verb.PermanentlyDeleted" : "Verb.Deleted"), paths, _noun, extended), paths, permanent, format);
 }

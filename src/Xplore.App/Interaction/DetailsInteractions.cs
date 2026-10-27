@@ -31,7 +31,6 @@ public sealed class DetailsInteractions
     private ItemViewModel? _renameCandidate;
     private HashSet<ItemViewModel> _bandBase = [];
     private Point? _rightPress;
-    private Task _typing = Task.CompletedTask;
     private TabViewModel? _watchedTab;
 
     public DetailsInteractions(MainWindow window, DragDropController drag)
@@ -164,8 +163,7 @@ public sealed class DetailsInteractions
             return;
 
         e.Handled = true;
-        _typing = SelectByPrefixAsync(_typing, tab, c, DateTime.UtcNow);
-        _typing.Forget();
+        SelectByPrefix(tab, c, DateTime.UtcNow);
     }
 
     public void RenameKeyDown(object sender, KeyEventArgs e)
@@ -339,11 +337,9 @@ public sealed class DetailsInteractions
         }
     }
 
-    // Each keystroke waits for the settings file, so keystrokes are chained to be applied in the order they were typed.
-    private async Task SelectByPrefixAsync(Task previous, TabViewModel tab, char c, DateTime typedAt)
+    private void SelectByPrefix(TabViewModel tab, char c, DateTime typedAt)
     {
-        await previous.ContinueWith(_ => { }, TaskScheduler.Default);
-        var timeout = TimeSpan.FromMilliseconds((await SettingsStore.LoadAsync()).PrefixTimeoutMs);
+        var timeout = TimeSpan.FromMilliseconds(_window.Main.Settings.Current.PrefixTimeoutMs);
         var prefix = _prefix.Add(c, typedAt, timeout);
         if (tab != Tab)
             return;
