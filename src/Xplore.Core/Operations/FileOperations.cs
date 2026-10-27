@@ -38,6 +38,16 @@ public static class FileOperations
         return Exists(Path.Combine(dir, name)) ? Loc.Format("Error.NameExists", name) : null;
     }
 
+    public static string CreateFile(string dir, string name)
+    {
+        if (NameError(dir, name) is { } error)
+            throw new ArgumentException(error);
+
+        var path = Path.Combine(dir, name);
+        File.Create(path).Dispose();
+        return path;
+    }
+
     public static string CreateFile(string dir)
     {
         var path = UniquePath(dir, Loc.Get("Default.NewFile"), ".txt");
@@ -119,6 +129,8 @@ public static class FileOperations
     public static Task<string> CreateFolderAsync(string dir) => Task.Run(() => CreateFolder(dir));
 
     public static Task<string> CreateFolderAsync(string dir, string name) => Task.Run(() => CreateFolder(dir, name));
+
+    public static Task<string> CreateFileAsync(string dir, string name) => Task.Run(() => CreateFile(dir, name));
 
     public static Task<string> CreateFileAsync(string dir) => Task.Run(() => CreateFile(dir));
 

@@ -51,8 +51,8 @@ public sealed class FileActions
         DeleteCommand = new AsyncRelayCommand(() => Delete(permanent: false), () => HasSelection);
         PermanentDeleteCommand = new AsyncRelayCommand(() => Delete(permanent: true), () => HasSelection);
         RenameCommand = new RelayCommand(() => BeginRename(_folder.Selection[0]), () => _folder.Selection is [_] && _folder.ItemsEditable);
-        NewFolderCommand = new AsyncRelayCommand(NewFolder, () => _folder.CurrentPath is not null);
-        NewFileCommand = new AsyncRelayCommand(() => CreateNew(FileOperations.CreateFileAsync, isFolder: false), () => _folder.CurrentPath is not null);
+        NewFolderCommand = new AsyncRelayCommand(() => NewItem(isFolder: true), () => _folder.CurrentPath is not null);
+        NewFileCommand = new AsyncRelayCommand(() => NewItem(isFolder: false), () => _folder.CurrentPath is not null);
         PropertiesCommand = new AsyncRelayCommand(
             () => _runner.Run(() => ShellVerbs.Properties(HasSelection ? SelectedPaths : [_folder.CurrentPath!])),
             () => HasSelection || _folder.CurrentPath is not null);
@@ -193,21 +193,23 @@ public sealed class FileActions
         return links;
     }
 
-    private async Task NewFolder()
+    private async Task NewItem(bool isFolder)
     {
-        if (!_settings.Current.NewFolderPrompt)
+        if (!_settings.Current.NewItemPrompt)
         {
-            await CreateNew(FileOperations.CreateFolderAsync, isFolder: true);
+            await CreateNew(isFolder ? FileOperations.CreateFolderAsync : FileOperations.CreateFileAsync, isFolder);
             return;
         }
 
-        if (await _prompts.AskFolderNameAsync(_folder.CurrentPath!) is not { } name)
+        if (await _prompts.AskNewItemNameAsync(_folder.CurrentPath!, isFolder) is not { } name)
             return;
 
         await _runner.RunAsync(async () =>
         {
-            var path = await FileOperations.CreateFolderAsync(_folder.CurrentPath!, name);
-            _actions.Record(new CreateAction(path, true));
+            var path = await (isFolder
+                ? FileOperations.CreateFolderAsync(_folder.CurrentPath!, name)
+                : FileOperations.CreateFileAsync(_folder.CurrentPath!, name));
+            _actions.Record(new CreateAction(path, isFolder));
             await _folder.RefreshAsync([path]);
         });
     }

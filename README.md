@@ -35,7 +35,7 @@ Settings are stored as YAML in `%APPDATA%\Xplore\settings.yaml`; omitted keys ta
 | --- | --- | --- |
 | `Language` | system language | Culture name of the UI language, such as `de` or `pt` (applies after a restart) |
 | `ForwardSlashes` | `false` | Show and copy paths with `/` instead of `\` |
-| `NewFolderPrompt` | `false` | Ask for the name when creating a new folder |
+| `NewItemPrompt` | `false` | Ask for the name when creating a new folder or file |
 | `FoldersFirst` | `true` | List folders before files; `false` sorts them together |
 | `DateFormat`, `LongTimeFormat`, `ShortTimeFormat` | none | .NET patterns such as `yyyy-MM-dd`, `HH:mm:ss`, `HH:mm`; none uses the operating system setting |
 | `HistoryDepth` | `100` | Maximum length of the undo history path |

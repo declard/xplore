@@ -5,15 +5,19 @@ using Xplore.Core.Operations;
 
 namespace Xplore.App;
 
-public partial class NewFolderWindow : Window
+public partial class NewItemWindow : Window
 {
     private readonly string _dir;
 
-    public NewFolderWindow(string dir)
+    public NewItemWindow(string dir, bool isFolder)
     {
         InitializeComponent();
         _dir = dir;
-        NameBox.Text = Path.GetFileName(FileOperations.UniquePath(dir, Loc.Get("Default.NewFolder")));
+        Title = Loc.Get(isFolder ? "NewFolder.Title" : "Menu.NewFile");
+        Prompt.Text = Loc.Get(isFolder ? "NewFolder.Prompt" : "NewFile.Prompt");
+        NameBox.Text = Path.GetFileName(isFolder
+            ? FileOperations.UniquePath(dir, Loc.Get("Default.NewFolder"))
+            : FileOperations.UniquePath(dir, Loc.Get("Default.NewFile"), ".txt"));
         Loaded += (_, _) =>
         {
             NameBox.Focus();
@@ -21,7 +25,7 @@ public partial class NewFolderWindow : Window
         };
     }
 
-    public string FolderName => NameBox.Text;
+    public string ItemName => NameBox.Text;
 
     private void NameBox_TextChanged(object sender, TextChangedEventArgs e)
     {

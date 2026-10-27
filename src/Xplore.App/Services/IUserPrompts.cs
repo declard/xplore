@@ -9,5 +9,5 @@ public interface IUserPrompts
     Task<bool> ConfirmAsync(string question);
     Task<bool> ConfirmDeleteAsync(IReadOnlyList<ItemViewModel> items, bool permanent);
     Task<(OpenWithApp? App, bool UseSystemDialog)> ChooseOpenWithAsync(string path);
-    Task<string?> AskFolderNameAsync(string dir);
+    Task<string?> AskNewItemNameAsync(string dir, bool isFolder);
 }

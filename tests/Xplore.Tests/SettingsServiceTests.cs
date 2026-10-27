@@ -68,10 +68,10 @@ public class SettingsServiceTests : IDisposable
     public async Task ReloadPicksUpAnExternalEdit()
     {
         var service = Create();
-        await System.IO.File.WriteAllTextAsync(File, "NewFolderPrompt: true\n");
+        await System.IO.File.WriteAllTextAsync(File, "NewItemPrompt: true\n");
         await service.ReloadAsync();
 
-        Assert.True(service.Current.NewFolderPrompt);
+        Assert.True(service.Current.NewItemPrompt);
         Assert.Single(_changes);
     }
 

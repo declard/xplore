@@ -4,9 +4,9 @@ using Xplore.Core.Settings;
 
 namespace Xplore.Tests;
 
-public class NewFolderTests : IDisposable
+public class NewItemTests : IDisposable
 {
-    private readonly string _dir = Directory.CreateTempSubdirectory("xp-newfolder").FullName;
+    private readonly string _dir = Directory.CreateTempSubdirectory("xp-newitem").FullName;
 
     public void Dispose() => Directory.Delete(_dir, recursive: true);
 
@@ -16,6 +16,23 @@ public class NewFolderTests : IDisposable
         var path = FileOperations.CreateFolder(_dir, "Photos");
         Assert.Equal(Path.Combine(_dir, "Photos"), path);
         Assert.True(Directory.Exists(path));
+    }
+
+    [Fact]
+    public void CreatesTheNamedFile()
+    {
+        var path = FileOperations.CreateFile(_dir, "notes.md");
+        Assert.Equal(Path.Combine(_dir, "notes.md"), path);
+        Assert.True(File.Exists(path));
+    }
+
+    [Fact]
+    public void RejectsAnInvalidOrExistingFileName()
+    {
+        File.WriteAllText(Path.Combine(_dir, "a.txt"), "");
+        Assert.Throws<ArgumentException>(() => FileOperations.CreateFile(_dir, "a.txt"));
+        Assert.Throws<ArgumentException>(() => FileOperations.CreateFile(_dir, "what?.txt"));
+        Assert.Single(Directory.GetFileSystemEntries(_dir));
     }
 
     [Theory]
@@ -38,7 +55,7 @@ public class NewFolderTests : IDisposable
     }
 
     [Fact]
-    public void PromptIsOffByDefault() => Assert.False(AppSettings.Default.NewFolderPrompt);
+    public void PromptIsOffByDefault() => Assert.False(AppSettings.Default.NewItemPrompt);
 }
 
 public class StartTabsTests : IDisposable
@@ -87,7 +104,7 @@ public class StartTabsTests : IDisposable
         var yaml = Yaml.Writer.Serialize(settings);
         Assert.Contains("StartLocation:", yaml);
         var back = Yaml.Reader.Deserialize<AppSettings>(yaml);
-        Assert.Equal((50, true, true, new StartLocation(StartMode.Custom, @"D:\x")), (back.HistoryDepth, back.ForwardSlashes, back.NewFolderPrompt, back.StartLocation));
+        Assert.Equal((50, true, true, new StartLocation(StartMode.Custom, @"D:\x")), (back.HistoryDepth, back.ForwardSlashes, back.NewItemPrompt, back.StartLocation));
     }
 
     [Fact]
@@ -112,7 +129,7 @@ public class StartTabsTests : IDisposable
     public void MissingKeysTakeDefaultsAndNullsAreOmitted()
     {
         var back = Yaml.Reader.Deserialize<AppSettings>("StartLocation:\n  Type: Restore\n");
-        Assert.Equal((StartMode.Restore, 100, false), (back.StartLocation!.Type, back.HistoryDepth, back.NewFolderPrompt));
+        Assert.Equal((StartMode.Restore, 100, false), (back.StartLocation!.Type, back.HistoryDepth, back.NewItemPrompt));
         Assert.DoesNotContain("CustomPath", Yaml.Writer.Serialize(new StartLocation(StartMode.Restore)));
     }
 }

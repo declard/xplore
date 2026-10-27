@@ -56,7 +56,7 @@
             <ComboBox x:Name="LanguageBox" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" DisplayMemberPath="Name" SelectedValuePath="Code"/>
 
             <CheckBox x:Name="ForwardSlashesBox" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Content="{l:Loc Settings.ForwardSlashes}"/>
-            <CheckBox x:Name="NewFolderPromptBox" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Content="{l:Loc Settings.NewFolderPrompt}"/>
+            <CheckBox x:Name="NewItemPromptBox" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Content="{l:Loc Settings.NewItemPrompt}"/>
             <CheckBox x:Name="FoldersFirstBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="{l:Loc Settings.FoldersFirst}"/>
 
             <TextBlock Grid.Row="4" Text="{l:Loc Settings.DateFormat}"/>

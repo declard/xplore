@@ -23,7 +23,7 @@ public sealed record OpenWithApp(string Name, string Path, string? Icon = null)
 
 // HistoryDepth: max length of the undo history path before its oldest action is dropped;
 // ForwardSlashes: show and copy paths with "/" instead of "\";
-// NewFolderPrompt: ask for the name of a new folder before creating it instead of creating it and renaming in place;
+// NewItemPrompt: ask for the name of a new folder or file before creating it instead of creating it and renaming in place;
 // StartLocation: what the app opens at startup;
 // PrefixTimeoutMs: max pause in milliseconds between typed characters of one prefix search in the details view;
 // Language: culture name of the UI language such as "ru", null for the language of the operating system;
@@ -32,7 +32,7 @@ public sealed record OpenWithApp(string Name, string Path, string? Icon = null)
 public sealed record AppSettings(
     int HistoryDepth = AppSettings.DefaultHistoryDepth,
     bool ForwardSlashes = false,
-    bool NewFolderPrompt = false,
+    bool NewItemPrompt = false,
     StartLocation? StartLocation = null,
     int PrefixTimeoutMs = AppSettings.DefaultPrefixTimeoutMs,
     string? Language = null,

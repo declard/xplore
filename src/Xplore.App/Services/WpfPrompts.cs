@@ -19,8 +19,8 @@ public sealed class WpfPrompts : IUserPrompts
     public Task<bool> ConfirmDeleteAsync(IReadOnlyList<ItemViewModel> items, bool permanent) =>
         OnUi(() => new DeleteConfirmWindow(items, permanent) { Owner = Application.Current.MainWindow }.ShowDialog() == true);
 
-    public Task<string?> AskFolderNameAsync(string dir) =>
-        OnUi(() => new NewFolderWindow(dir) { Owner = Application.Current.MainWindow } is var window && window.ShowDialog() == true ? window.FolderName : null);
+    public Task<string?> AskNewItemNameAsync(string dir, bool isFolder) =>
+        OnUi(() => new NewItemWindow(dir, isFolder) { Owner = Application.Current.MainWindow } is var window && window.ShowDialog() == true ? window.ItemName : null);
 
     public Task<(OpenWithApp? App, bool UseSystemDialog)> ChooseOpenWithAsync(string path) =>
         OnUi<(OpenWithApp?, bool)>(() =>

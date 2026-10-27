@@ -23,7 +23,7 @@ public partial class SettingsWindow : Window
         LanguageBox.ItemsSource = LanguageChoices(settings.Language);
         LanguageBox.SelectedValue = settings.Language ?? "";
         ForwardSlashesBox.IsChecked = settings.ForwardSlashes;
-        NewFolderPromptBox.IsChecked = settings.NewFolderPrompt;
+        NewItemPromptBox.IsChecked = settings.NewItemPrompt;
         FoldersFirstBox.IsChecked = settings.FoldersFirst;
         Show(DateFormatBox, TimestampPatterns.Dates, settings.DateFormat);
         Show(LongTimeFormatBox, TimestampPatterns.LongTimes, settings.LongTimeFormat);
@@ -42,7 +42,7 @@ public partial class SettingsWindow : Window
     {
         Language = LanguageBox.SelectedValue is string { Length: > 0 } code ? code : null,
         ForwardSlashes = ForwardSlashesBox.IsChecked == true,
-        NewFolderPrompt = NewFolderPromptBox.IsChecked == true,
+        NewItemPrompt = NewItemPromptBox.IsChecked == true,
         FoldersFirst = FoldersFirstBox.IsChecked == true,
         DateFormat = Pattern(DateFormatBox),
         LongTimeFormat = Pattern(LongTimeFormatBox),
