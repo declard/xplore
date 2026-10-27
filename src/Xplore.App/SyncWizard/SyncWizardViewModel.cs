@@ -1,4 +1,5 @@
 using Xplore.Core.Localization;
+using Xplore.Core.Settings;
 using Xplore.Sync;
 using System.ComponentModel;
 using System.Globalization;
@@ -10,15 +11,17 @@ namespace Xplore.App;
 public sealed class SyncWizardViewModel : ObservableObject
 {
     private readonly Action? _filesChanged;
+    private readonly TimestampFormat _time;
     private CancellationTokenSource? _cts;
     private DiffDocument? _diff;
     private PlanDocument? _plan;
 
-    public SyncWizardViewModel(string left, string right, Action? filesChanged = null)
+    public SyncWizardViewModel(string left, string right, TimestampFormat time, Action? filesChanged = null)
     {
         Left = left;
         Right = right;
         _filesChanged = filesChanged;
+        _time = time;
         Filters =
         [
             .. new (DiffStatus Status, Brush Brush)[]
@@ -245,7 +248,7 @@ public sealed class SyncWizardViewModel : ObservableObject
     private void SetDiff(DiffDocument diff)
     {
         _diff = diff;
-        var rows = diff.Entries.Select(e => new DiffRow(e)).ToList();
+        var rows = diff.Entries.Select(e => new DiffRow(e, _time)).ToList();
         var view = new ListCollectionView(rows) { Filter = o => o is DiffRow r && Filters.First(f => f.Status == r.Status).IsChecked };
         foreach (var f in Filters)
         {

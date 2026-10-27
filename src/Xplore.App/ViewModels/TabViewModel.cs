@@ -41,6 +41,7 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
     private SortColumn _sortColumn = SortColumn.Name;
     private bool _sortAscending = true;
     private readonly ISettings _settings;
+    private readonly TimestampFormat _time;
     private IReadOnlyList<ItemViewModel> _selection = [];
     private readonly Subject<ShowRequest> _requests = new();
     private readonly IDisposable _showing;
@@ -54,12 +55,14 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
         OpenWithStore openWith,
         ISettings settings,
         PathFormat format,
+        TimestampFormat time,
         string? location = null)
     {
         _fs = fs;
         _prompts = prompts;
         _bookmarks = bookmarks;
         _settings = settings;
+        _time = time;
         _runner = new OperationRunner(prompts);
         Terminal = new ConsoleViewModel(format, () => PathWith(LocationCapabilities.Console), () => SelectedPaths);
         Tree = new FolderTree(fs, bookmarks, () => CurrentPath, NavigateToAsync);
@@ -277,7 +280,7 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
     private void OnSearchFound(FsEntry entry)
     {
         _entries.Add(entry);
-        Items.Add(new ItemViewModel(entry));
+        Items.Add(new ItemViewModel(entry, _time));
         OnPropertyChanged(nameof(StatusText));
     }
 
@@ -354,7 +357,7 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
         await foreach (var e in _fs.EnumerateAsync(location, ct))
         {
             _entries.Add(e);
-            Items.Add(new ItemViewModel(e) { IsSelected = selected.Contains(e.Path) });
+            Items.Add(new ItemViewModel(e, _time) { IsSelected = selected.Contains(e.Path) });
             OnPropertyChanged(nameof(StatusText));
         }
 
@@ -400,7 +403,7 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
         var ordered = CurrentPath is null ? _entries : new FsSorting(_settings.Current.FoldersFirst).Sort(_entries, _sortColumn, _sortAscending);
         foreach (var e in ordered)
         {
-            Items.Add(new ItemViewModel(e) { IsSelected = selected.Contains(e.Path) });
+            Items.Add(new ItemViewModel(e, _time) { IsSelected = selected.Contains(e.Path) });
         }
 
         OnPropertyChanged(nameof(StatusText));

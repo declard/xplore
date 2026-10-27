@@ -13,10 +13,18 @@ public sealed class MainViewModel : ObservableObject
     private readonly TabFactory _tabs;
     private readonly SessionStore _sessions;
 
-    public MainViewModel(ISettings settings, PathFormat format, ActionHistoryStore history, TabFactory tabs, SessionStore sessions, StartTabs start)
+    public MainViewModel(
+        ISettings settings,
+        PathFormat format,
+        TimestampFormat time,
+        ActionHistoryStore history,
+        TabFactory tabs,
+        SessionStore sessions,
+        StartTabs start)
     {
         Settings = settings;
         PathFormat = format;
+        TimestampFormat = time;
         _history = history;
         _tabs = tabs;
         _sessions = sessions;
@@ -32,6 +40,7 @@ public sealed class MainViewModel : ObservableObject
 
     public ISettings Settings { get; }
     public PathFormat PathFormat { get; }
+    public TimestampFormat TimestampFormat { get; }
     public ObservableCollection<TabViewModel> Tabs { get; } = [];
     public ActionHistoryStore History => _history;
     public ICommand UndoCommand { get; }

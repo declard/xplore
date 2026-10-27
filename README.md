@@ -37,6 +37,7 @@ Settings are stored as YAML in `%APPDATA%\Xplore\settings.yaml`; omitted keys ta
 | `ForwardSlashes` | `false` | Show and copy paths with `/` instead of `\` |
 | `NewFolderPrompt` | `false` | Ask for the name when creating a new folder |
 | `FoldersFirst` | `true` | List folders before files; `false` sorts them together |
+| `DateFormat`, `LongTimeFormat`, `ShortTimeFormat` | none | .NET patterns such as `yyyy-MM-dd`, `HH:mm:ss`, `HH:mm`; none uses the operating system setting |
 | `HistoryDepth` | `100` | Maximum length of the undo history path |
 | `PrefixTimeoutMs` | `1000` | Longest pause between typed characters of one type-ahead search |
 | `StartLocation` | `Default` | What opens at startup: `Default` (drive list), `Restore` (previous tabs) or `Custom` (a folder) |

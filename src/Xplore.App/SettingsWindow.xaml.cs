@@ -11,6 +11,8 @@ public partial class SettingsWindow : Window
 {
     private sealed record LanguageChoice(string Code, string Name);
 
+    private sealed record PatternChoice(string Value, string Label);
+
     private readonly AppSettings _settings;
 
     public SettingsWindow(AppSettings settings)
@@ -23,6 +25,9 @@ public partial class SettingsWindow : Window
         ForwardSlashesBox.IsChecked = settings.ForwardSlashes;
         NewFolderPromptBox.IsChecked = settings.NewFolderPrompt;
         FoldersFirstBox.IsChecked = settings.FoldersFirst;
+        Show(DateFormatBox, TimestampPatterns.Dates, settings.DateFormat);
+        Show(LongTimeFormatBox, TimestampPatterns.LongTimes, settings.LongTimeFormat);
+        Show(ShortTimeFormatBox, TimestampPatterns.ShortTimes, settings.ShortTimeFormat);
         HistoryDepthBox.Text = settings.HistoryDepth.ToString(CultureInfo.InvariantCulture);
         PrefixTimeoutBox.Text = settings.PrefixTimeoutMs.ToString(CultureInfo.InvariantCulture);
         StartTypeBox.ItemsSource = Choice<StartMode>.All;
@@ -39,10 +44,26 @@ public partial class SettingsWindow : Window
         ForwardSlashes = ForwardSlashesBox.IsChecked == true,
         NewFolderPrompt = NewFolderPromptBox.IsChecked == true,
         FoldersFirst = FoldersFirstBox.IsChecked == true,
+        DateFormat = Pattern(DateFormatBox),
+        LongTimeFormat = Pattern(LongTimeFormatBox),
+        ShortTimeFormat = Pattern(ShortTimeFormatBox),
         HistoryDepth = int.Parse(HistoryDepthBox.Text.Trim(), CultureInfo.InvariantCulture),
         PrefixTimeoutMs = int.Parse(PrefixTimeoutBox.Text.Trim(), CultureInfo.InvariantCulture),
         StartLocation = new((StartMode)StartTypeBox.SelectedValue, CustomPathBox.Text.Trim() is { Length: > 0 } path ? path : null),
     };
+
+    private static string? Pattern(ComboBox box) => box.SelectedValue is string { Length: > 0 } pattern ? pattern : null;
+
+    private static void Show(ComboBox box, IEnumerable<string> patterns, string? current)
+    {
+        IReadOnlyList<PatternChoice> choices =
+        [
+            new("", Loc.Get("Settings.Format.System")),
+            .. patterns.Append(current).OfType<string>().Where(pattern => pattern.Length > 0).Distinct().Select(pattern => new PatternChoice(pattern, pattern)),
+        ];
+        box.ItemsSource = choices;
+        box.SelectedValue = current ?? "";
+    }
 
     private static IReadOnlyList<LanguageChoice> LanguageChoices(string? current) =>
     [

@@ -10,7 +10,8 @@ public sealed class TabFactory(
     ActionHistoryStore history,
     OpenWithStore openWith,
     ISettings settings,
-    PathFormat format)
+    PathFormat format,
+    TimestampFormat time)
 {
-    public TabViewModel Create(string? location) => new(fs, prompts, bookmarks, history, openWith, settings, format, location);
+    public TabViewModel Create(string? location) => new(fs, prompts, bookmarks, history, openWith, settings, format, time, location);
 }

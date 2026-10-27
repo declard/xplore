@@ -96,4 +96,37 @@ public class SettingsServiceTests : IDisposable
         settings.Current = AppSettings.Default with { ForwardSlashes = true };
         Assert.Equal("C:/a/b", format.Show(@"C:\a\b"));
     }
+
+    private static readonly DateTime Stamp = new(2026, 3, 9, 14, 5, 7);
+
+    [Fact]
+    public void TimestampFormatDefaultsToTheOperatingSystem()
+    {
+        var format = new TimestampFormat(new FakeSettings(AppSettings.Default));
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+
+        Assert.Equal(Stamp.ToString("d", culture), format.Date(Stamp));
+        Assert.Equal(Stamp.ToString("t", culture), format.ShortTime(Stamp));
+        Assert.Equal(Stamp.ToString("T", culture), format.LongTime(Stamp));
+    }
+
+    [Fact]
+    public void TimestampFormatAppliesCustomPatternsAndFollowsTheSettings()
+    {
+        var settings = new FakeSettings(AppSettings.Default with { DateFormat = "yyyy-MM-dd", LongTimeFormat = "HH:mm:ss", ShortTimeFormat = "HH:mm" });
+        var format = new TimestampFormat(settings);
+
+        Assert.Equal("2026-03-09 14:05", format.Short(Stamp));
+        Assert.Equal("2026-03-09 14:05:07", format.Long(Stamp));
+
+        settings.Current = AppSettings.Default with { DateFormat = "dd.MM.yyyy" };
+        Assert.Equal("09.03.2026", format.Date(Stamp));
+    }
+
+    [Fact]
+    public void TimestampFormatFallsBackToTheOperatingSystemOnAnInvalidPattern()
+    {
+        var format = new TimestampFormat(new FakeSettings(AppSettings.Default with { DateFormat = "x" }));
+        Assert.Equal(Stamp.ToString("d", System.Globalization.CultureInfo.CurrentCulture), format.Date(Stamp));
+    }
 }

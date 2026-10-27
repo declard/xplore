@@ -1,10 +1,11 @@
 using Xplore.Core.Localization;
 using System.Globalization;
+using Xplore.Core.Settings;
 using Xplore.Sync;
 
 namespace Xplore.App;
 
-public sealed record DiffRow(DiffEntry Entry)
+public sealed record DiffRow(DiffEntry Entry, TimestampFormat Time)
 {
     public DiffStatus Status => Entry.Status;
     public string Symbol => Entry.Status.Symbol().ToString();
@@ -15,7 +16,7 @@ public sealed record DiffRow(DiffEntry Entry)
     public string RightSize => Size(Entry.Right);
     public string Hashes => $"left:  {Entry.Left?.Hash ?? "-"}\nright: {Entry.Right?.Hash ?? "-"}";
 
-    private static string Modified(SideInfo? s) => s?.Modified.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture) ?? "";
+    private string Modified(SideInfo? s) => s is null ? "" : Time.Long(s.Modified.ToLocalTime());
 
     private static string Size(SideInfo? s) =>
         s switch

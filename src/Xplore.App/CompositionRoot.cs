@@ -28,6 +28,7 @@ public static class CompositionRoot
             .AddSingleton(start)
             .AddSingleton(new OpenWithRegistry(AppFolder.File("openWith.yaml")))
             .AddSingleton<PathFormat>()
+            .AddSingleton<TimestampFormat>()
             .AddSingleton<IUserPrompts, WpfPrompts>()
             .AddSingleton<FileLocationProvider>()
             .AddSingleton<ILocationProvider, RecycleBinLocationProvider>()

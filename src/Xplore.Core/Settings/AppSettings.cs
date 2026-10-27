@@ -27,7 +27,8 @@ public sealed record OpenWithApp(string Name, string Path, string? Icon = null)
 // StartLocation: what the app opens at startup;
 // PrefixTimeoutMs: max pause in milliseconds between typed characters of one prefix search in the details view;
 // Language: culture name of the UI language such as "ru", null for the language of the operating system;
-// FoldersFirst: list folders before files in the details view instead of sorting them together.
+// FoldersFirst: list folders before files in the details view instead of sorting them together;
+// DateFormat, LongTimeFormat, ShortTimeFormat: custom .NET patterns for dates and times, null for the regional settings of the operating system.
 public sealed record AppSettings(
     int HistoryDepth = AppSettings.DefaultHistoryDepth,
     bool ForwardSlashes = false,
@@ -35,7 +36,10 @@ public sealed record AppSettings(
     StartLocation? StartLocation = null,
     int PrefixTimeoutMs = AppSettings.DefaultPrefixTimeoutMs,
     string? Language = null,
-    bool FoldersFirst = true)
+    bool FoldersFirst = true,
+    string? DateFormat = null,
+    string? LongTimeFormat = null,
+    string? ShortTimeFormat = null)
 {
     public const int DefaultHistoryDepth = 100;
     public const int DefaultPrefixTimeoutMs = 1000;

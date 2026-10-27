@@ -1,5 +1,6 @@
 using Xplore.Core.Localization;
 using System.Windows;
+using Xplore.Core.Settings;
 using Xplore.Sync;
 using Microsoft.Win32;
 
@@ -10,10 +11,10 @@ public partial class SyncWizardWindow : Window
     private static string AllFiles => Loc.Get("Filter.AllFiles");
     private readonly SyncWizardViewModel _vm;
 
-    public SyncWizardWindow(string left, string right, Action? filesChanged = null)
+    public SyncWizardWindow(string left, string right, TimestampFormat time, Action? filesChanged = null)
     {
         InitializeComponent();
-        _vm = new SyncWizardViewModel(left, right, filesChanged)
+        _vm = new SyncWizardViewModel(left, right, time, filesChanged)
         {
             Confirm = text => MessageBox.Show(this, text, Loc.Get("Sync.RunPlan.Title"), MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes,
         };
