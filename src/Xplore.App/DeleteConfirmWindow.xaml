@@ -1,0 +1,32 @@
+<Window x:Class="Xplore.App.DeleteConfirmWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:Xplore.App.Localization"
+        Title="{l:Loc Common.Delete}" Width="440" SizeToContent="Height" MaxHeight="480" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="White"
+        FontFamily="Segoe UI" FontSize="12">
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button x:Name="YesButton" Content="{l:Loc Common.Yes}" Width="80" Height="26" Margin="0,0,8,0" Click="Yes_Click"/>
+            <Button x:Name="NoButton" Content="{l:Loc Common.No}" Width="80" Height="26" IsCancel="True"/>
+        </StackPanel>
+        <TextBlock x:Name="Message" DockPanel.Dock="Top" TextWrapping="Wrap" Margin="0,0,0,10"/>
+        <ListBox x:Name="List" MaxHeight="230" BorderBrush="#D9D9D9" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="4,1"/>
+                    <Setter Property="Focusable" Value="False"/>
+                    <Setter Property="ToolTip" Value="{Binding Entry.Path}"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding Icon}" Width="16" Height="16" Margin="0,0,6,0"/>
+                        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</Window>

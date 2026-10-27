@@ -1,0 +1,17 @@
+<Window x:Class="Xplore.App.NewFolderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:Xplore.App.Localization"
+        Title="{l:Loc NewFolder.Title}" Width="380" SizeToContent="Height" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="White"
+        FontFamily="Segoe UI" FontSize="12">
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button x:Name="OkButton" Content="{l:Loc Common.Create}" Width="80" Height="26" Margin="0,0,8,0" IsDefault="True" Click="Ok_Click"/>
+            <Button Content="{l:Loc Common.Cancel}" Width="80" Height="26" IsCancel="True"/>
+        </StackPanel>
+        <TextBlock DockPanel.Dock="Top" Text="{l:Loc NewFolder.Prompt}" Margin="0,0,0,6"/>
+        <TextBox x:Name="NameBox" DockPanel.Dock="Top" Padding="3,2" TextChanged="NameBox_TextChanged"/>
+        <TextBlock x:Name="Error" Foreground="#C42B1C" TextWrapping="Wrap" MinHeight="32" Margin="0,6,0,0"/>
+    </DockPanel>
+</Window>

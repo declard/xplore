@@ -1,0 +1,52 @@
+﻿*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+
+# Editors and IDEs
+.vscode/
+.idea/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.local.sln
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+artifacts/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Tests
+TestResults/
+*.trx
+*.coverage
+coverage/
+
+# Installer output
+*.msi
+*.msix
+*.wixpdb
+
+# NuGet
+.packages/
+*.nupkg
+
+# Local tooling
+.claude/settings.local.json
+graphify-out/
+scripts/dev.yaml
+.testing

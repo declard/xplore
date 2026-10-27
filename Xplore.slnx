@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Xplore.App/Xplore.App.csproj" />
+    <Project Path="src/Xplore.Core/Xplore.Core.csproj" />
+    <Project Path="src/Xplore.Sync/Xplore.Sync.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Xplore.Tests/Xplore.Tests.csproj" />
+  </Folder>
+</Solution>

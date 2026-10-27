@@ -1,0 +1,354 @@
+<Window x:Class="Xplore.App.SyncWizardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:Xplore.App.Localization"
+        xmlns:local="clr-namespace:Xplore.App"
+        xmlns:sync="clr-namespace:Xplore.Sync;assembly=Xplore.Sync"
+        Title="{l:Loc Main.Sync.ToolTip}" Width="1000" Height="700" MinWidth="780" MinHeight="520"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="White" FontFamily="Segoe UI" FontSize="12">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="80"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,16,0"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="24"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="SelectedValuePath" Value="Value"/>
+            <Setter Property="DisplayMemberPath" Value="Label"/>
+        </Style>
+        <Style x:Key="Caption" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#4C4C4C"/>
+            <Setter Property="Margin" Value="0,10,0,4"/>
+        </Style>
+        <Style x:Key="Grid" TargetType="DataGrid">
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="GridLinesVisibility" Value="None"/>
+            <Setter Property="BorderBrush" Value="#D9D9D9"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="RowHeaderWidth" Value="0"/>
+            <Setter Property="SelectionMode" Value="Extended"/>
+            <Setter Property="EnableRowVirtualization" Value="True"/>
+        </Style>
+
+        <Style x:Key="DiffRowStyle" TargetType="DataGridRow">
+            <Setter Property="ToolTip" Value="{Binding Hashes}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static sync:DiffStatus.Identical}">
+                    <Setter Property="Foreground" Value="{x:Static local:SyncColors.Muted}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static sync:DiffStatus.Different}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.Different}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static sync:DiffStatus.LeftOnly}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.LeftOnly}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static sync:DiffStatus.RightOnly}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.RightOnly}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static sync:DiffStatus.TypeConflict}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.Conflict}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="PlanRowStyle" TargetType="DataGridRow">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Command}" Value="{x:Static sync:PlanCommand.Noop}">
+                    <Setter Property="Foreground" Value="{x:Static local:SyncColors.Muted}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Command}" Value="{x:Static sync:PlanCommand.Mkdir}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.LeftOnly}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Command}" Value="{x:Static sync:PlanCommand.Copy}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.LeftOnly}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Command}" Value="{x:Static sync:PlanCommand.CopyReplace}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.Different}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Command}" Value="{x:Static sync:PlanCommand.Move}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.RightOnly}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Command}" Value="{x:Static sync:PlanCommand.MoveReplace}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.Different}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Command}" Value="{x:Static sync:PlanCommand.Delete}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.Conflict}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ResultRowStyle" TargetType="DataGridRow">
+            <Setter Property="ToolTip" Value="{Binding Message}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Outcome}" Value="{x:Static sync:StepOutcome.Skipped}">
+                    <Setter Property="Foreground" Value="{x:Static local:SyncColors.Muted}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Outcome}" Value="{x:Static sync:StepOutcome.Done}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.LeftOnly}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Outcome}" Value="{x:Static sync:StepOutcome.Failed}">
+                    <Setter Property="Background" Value="{x:Static local:SyncColors.Conflict}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TabControl Grid.Row="0" SelectedIndex="{Binding Step, Mode=TwoWay}">
+            <!-- 1. Scope -->
+            <TabItem Header="{l:Loc Sync.Tab.Scope}">
+                <Grid Margin="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="{l:Loc Sync.LeftFolder}" VerticalAlignment="Center" Margin="0,0,12,8"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Left, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,8"/>
+                    <Button Grid.Row="0" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="Left" Click="BrowseRoot_Click" Margin="0,0,0,8"/>
+
+                    <TextBlock Grid.Row="1" Text="{l:Loc Sync.RightFolder}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Right, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0"/>
+                    <Button Grid.Row="1" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="Right" Click="BrowseRoot_Click"/>
+
+                    <DockPanel Grid.Row="2" Grid.ColumnSpan="3">
+                        <Button DockPanel.Dock="Right" Content="{l:Loc Sync.ImportGlobs}" Margin="0" Click="ImportGlobs_Click"/>
+                        <TextBlock Style="{StaticResource Caption}" Text="{l:Loc Sync.Patterns.Hint}"/>
+                    </DockPanel>
+                    <TextBox Grid.Row="3" Grid.ColumnSpan="3" Height="Auto" Text="{Binding GlobsText, UpdateSourceTrigger=PropertyChanged}"
+                             AcceptsReturn="True" VerticalContentAlignment="Top" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" Padding="4"/>
+
+                    <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,12,0,0">
+                        <TextBlock Text="{l:Loc Sync.EqualSize}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <ComboBox Width="190" ItemsSource="{Binding HashModes}" SelectedValue="{Binding Hash}" Margin="0,0,16,0"
+                                  ToolTip="{l:Loc Sync.EqualSize.ToolTip}"/>
+                        <TextBlock Text="{l:Loc Sync.Tolerance}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBox Width="44" Text="{Binding Tolerance, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Right"/>
+                        <TextBlock Text="{l:Loc Sync.Tolerance.Unit}" VerticalAlignment="Center" Margin="4,0,16,0"/>
+                        <CheckBox Content="{l:Loc Sync.Expand}" IsChecked="{Binding Expand}"
+                                  ToolTip="{l:Loc Sync.Expand.ToolTip}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="5" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,14,0,0">
+                        <Button Content="{l:Loc Sync.Scan}" IsEnabled="{Binding CanScan}" Click="Scan_Click" FontWeight="SemiBold"/>
+                        <Button Content="{l:Loc Sync.ImportDiff}" Click="ImportDiff_Click" ToolTip="{l:Loc Sync.ImportDiff.ToolTip}"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <!-- 2. Diff -->
+            <TabItem Header="{l:Loc Sync.Tab.Diff}">
+                <DockPanel Margin="14">
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button Content="{l:Loc Common.Import}" Click="ImportDiff_Click"/>
+                            <Button Content="{l:Loc Common.Export}" Margin="0" IsEnabled="{Binding CanBuildPlan}" Click="ExportDiff_Click"/>
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding Filters}">
+                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsChecked}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="12" Height="12" Background="{Binding Brush}" BorderBrush="#BFBFBF" BorderThickness="1" Margin="0,0,5,0"/>
+                                            <TextBlock Text="{Binding Label}"/>
+                                        </StackPanel>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="{Binding DiffSummary}" Foreground="#4C4C4C" Margin="0,0,0,6" TextTrimming="CharacterEllipsis"/>
+                    <DataGrid Style="{StaticResource Grid}" ItemsSource="{Binding DiffView}" RowStyle="{StaticResource DiffRowStyle}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="" Binding="{Binding Symbol}" Width="28"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.Path}" Binding="{Binding Path}" Width="*"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.LeftModified}" Binding="{Binding LeftModified}" Width="140"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.LeftSize}" Binding="{Binding LeftSize}" Width="90">
+                                <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="TextAlignment" Value="Right"/></Style></DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.RightModified}" Binding="{Binding RightModified}" Width="140"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.RightSize}" Binding="{Binding RightSize}" Width="90">
+                                <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="TextAlignment" Value="Right"/></Style></DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- 3. Plan -->
+            <TabItem Header="{l:Loc Sync.Tab.Plan}">
+                <DockPanel Margin="14">
+                    <Grid DockPanel.Dock="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                            <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.Direction}"/>
+                            <ComboBox Width="150" SelectedIndex="{Binding Direction}">
+                                <ComboBoxItem Content="{l:Loc Sync.Direction.LeftToRight}"/>
+                                <ComboBoxItem Content="{l:Loc Sync.Direction.RightToLeft}"/>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                            <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.SourcePolicy}"/>
+                            <ComboBox Width="130" ItemsSource="{Binding SourcePolicies}" SelectedValue="{Binding SourcePolicy}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Margin="0,0,16,0">
+                            <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.MatchedPolicy}"/>
+                            <ComboBox Width="140" ItemsSource="{Binding MatchedPolicies}" SelectedValue="{Binding MatchedPolicy}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="3" Margin="0,0,16,0">
+                            <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.UnmatchedPolicy}"/>
+                            <ComboBox Width="130" ItemsSource="{Binding UnmatchedPolicies}" SelectedValue="{Binding UnmatchedPolicy}"/>
+                        </StackPanel>
+                        <Button Grid.Column="4" Content="{l:Loc Sync.BuildPlan}" VerticalAlignment="Bottom" FontWeight="SemiBold" IsEnabled="{Binding CanBuildPlan}" Click="BuildPlan_Click"/>
+                        <StackPanel Grid.Column="5" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                            <Button Content="{l:Loc Common.Import}" Click="ImportPlan_Click"/>
+                            <Button Content="{l:Loc Common.Export}" Margin="0" IsEnabled="{Binding CanRun}" Click="ExportPlan_Click"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid DockPanel.Dock="Top" Margin="0,10,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{l:Loc Sync.SourceFolder}" VerticalAlignment="Center" Margin="0,0,12,6"/>
+                        <TextBox Grid.Column="1" Text="{Binding PlanSource, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,6"/>
+                        <Button Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="PlanSource" Click="BrowseRoot_Click" Margin="0,0,0,6"/>
+                        <TextBlock Grid.Row="1" Text="{l:Loc Sync.TargetFolder}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding PlanTarget, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0"/>
+                        <Button Grid.Row="1" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="PlanTarget" Click="BrowseRoot_Click"/>
+                    </Grid>
+
+                    <TextBlock DockPanel.Dock="Bottom" Text="{Binding PlanSummary}" Foreground="#4C4C4C" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                    <DataGrid Style="{StaticResource Grid}" ItemsSource="{Binding PlanRows}" RowStyle="{StaticResource PlanRowStyle}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Binding="{Binding Number}" Width="56"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.Command}" Binding="{Binding CommandName}" Width="130"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.Path}" Binding="{Binding Path}" Width="*"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.Comment}" Binding="{Binding Comment}" Width="260"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- 4. Run -->
+            <TabItem Header="{l:Loc Sync.Tab.Run}">
+                <DockPanel Margin="14">
+                    <Grid DockPanel.Dock="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{l:Loc Sync.Quarantine}" VerticalAlignment="Center" Margin="0,0,12,6"/>
+                        <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,6">
+                            <ComboBox Width="190" ItemsSource="{Binding QuarantineModes}" SelectedValue="{Binding Quarantine}" Margin="0,0,8,0"
+                                      ToolTip="{l:Loc Sync.Quarantine.ToolTip}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{l:Loc Sync.QuarantineFolder}" VerticalAlignment="Center" Margin="0,0,12,6"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,8,6" IsEnabled="{Binding QuarantineFolderEnabled}" Text="{Binding QuarantineFolder, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Row="1" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="Quarantine" Click="BrowseRoot_Click" Margin="0,0,0,6" IsEnabled="{Binding QuarantineFolderEnabled}"/>
+                        <TextBlock Grid.Row="2" Text="{l:Loc Sync.ResumeLog}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,8,0" Text="{Binding ResumeLog, UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="{l:Loc Sync.ResumeLog.ToolTip}"/>
+                        <Button Grid.Row="2" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="ResumeLog" Click="BrowseRoot_Click"/>
+                    </Grid>
+
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,12,0,10">
+                        <CheckBox Content="{l:Loc Sync.ContinueOnError}" IsChecked="{Binding ContinueOnError}"/>
+                        <CheckBox Content="{l:Loc Sync.VerifyCopies}" IsChecked="{Binding VerifyAfterCopy}"/>
+                        <CheckBox Content="{l:Loc Sync.DryRun}" IsChecked="{Binding DryRun}"/>
+                        <Button Content="{l:Loc Sync.Run}" FontWeight="SemiBold" Margin="8,0,8,0" IsEnabled="{Binding CanRun}" Click="Run_Click"/>
+                    </StackPanel>
+
+                    <TextBlock DockPanel.Dock="Bottom" Text="{Binding RunSummary}" Foreground="#4C4C4C" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                    <DataGrid Style="{StaticResource Grid}" ItemsSource="{Binding Results}" RowStyle="{StaticResource ResultRowStyle}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Binding="{Binding Number}" Width="56"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.Command}" Binding="{Binding CommandName}" Width="130"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.Path}" Binding="{Binding Path}" Width="*"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.Result}" Binding="{Binding OutcomeText}" Width="80"/>
+                            <DataGridTextColumn Header="{l:Loc Sync.Column.Message}" Binding="{Binding Message}" Width="260"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+
+        <Grid Grid.Row="1" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ProgressBar Grid.ColumnSpan="2" Height="6" Margin="0,0,0,6" Maximum="{Binding ProgressMax, Mode=OneWay}" Value="{Binding ProgressValue, Mode=OneWay}"
+                         IsIndeterminate="{Binding IsIndeterminate}" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}"/>
+        </Grid>
+
+        <DockPanel Grid.Row="2" Margin="0,4,0,0">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="{l:Loc Sync.CancelOperation}" Click="CancelOperation_Click" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}"/>
+                <Button Content="{l:Loc Sync.Back}" Click="Back_Click"/>
+                <Button Content="{l:Loc Sync.Next}" Click="Next_Click"/>
+                <Button Content="{l:Loc Common.Close}" Margin="0" IsCancel="True"/>
+            </StackPanel>
+            <TextBlock Text="{Binding Status}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}" Margin="0,0,12,0">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding StatusIsError}" Value="True">
+                                <Setter Property="Foreground" Value="#C42B1C"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </DockPanel>
+    </Grid>
+</Window>
