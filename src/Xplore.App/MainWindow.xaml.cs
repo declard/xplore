@@ -75,16 +75,22 @@ public partial class MainWindow : Window
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        e.Handled = Window_PreviewKeyDownImpl(e.Key, e.SystemKey);
+    }
+
+    private bool Window_PreviewKeyDownImpl(Key key, Key systemKey)
+    {
         var ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
         var shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
-        if (ctrl && (e.Key is Key.Tab or Key.PageDown or Key.PageUp))
+        if (ctrl && (key is Key.Tab or Key.PageDown or Key.PageUp))
         {
-            CycleTabs(e.Key == Key.PageUp || (e.Key == Key.Tab && shift) ? -1 : 1);
-            e.Handled = true;
+            CycleTabs(key == Key.PageUp || (key == Key.Tab && shift) ? -1 : 1);
+            return true;
         }
-        else if (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey is Key.Left or Key.Right or Key.Up && Tab is { } nav)
+
+        if (Keyboard.Modifiers == ModifierKeys.Alt && systemKey is Key.Left or Key.Right or Key.Up && Tab is { } nav)
         {
-            ICommand go = e.SystemKey switch
+            ICommand go = systemKey switch
             {
                 Key.Left => nav.BackCommand,
                 Key.Right => nav.ForwardCommand,
@@ -95,30 +101,35 @@ public partial class MainWindow : Window
                 go.Execute(null);
             }
 
-            e.Handled = true;
+            return true;
         }
-        else if (e.Key == Key.F4 || (ctrl && !shift && e.Key == Key.L) || (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey == Key.D))
+
+        if (key == Key.F4 || (ctrl && !shift && key == Key.L) || (Keyboard.Modifiers == ModifierKeys.Alt && systemKey == Key.D))
         {
             ShowAddressEditor();
-            e.Handled = true;
+            return true;
         }
-        else if (ctrl && !shift && e.Key is Key.Z or Key.Y && Keyboard.FocusedElement is not TextBox)
+
+        if (ctrl && !shift && key is Key.Z or Key.Y && Keyboard.FocusedElement is not TextBox)
         {
-            (e.Key == Key.Z ? Main.UndoCommand : Main.RedoCommand).Execute(null);
-            e.Handled = true;
+            (key == Key.Z ? Main.UndoCommand : Main.RedoCommand).Execute(null);
+            return true;
         }
-        else if (e.Key == Key.F12 && Keyboard.Modifiers == ModifierKeys.None && Tab is { } console)
+
+        if (key == Key.F12 && Keyboard.Modifiers == ModifierKeys.None && Tab is { } console)
         {
             console.Terminal.IsExpanded = true;
             FocusConsoleInput();
-            e.Handled = true;
+            return true;
         }
-        else if (ctrl && !shift && e.Key is Key.E or Key.F)
+
+        if (ctrl && !shift && key is Key.E or Key.F)
         {
             SearchBox.Focus();
-            e.Handled = true;
+            return true;
         }
-        else if (ctrl && !shift && e.Key == Key.OemTilde && Tab is { } t)
+
+        if (ctrl && !shift && key == Key.OemTilde && Tab is { } t)
         {
             t.Terminal.IsExpanded = !t.Terminal.IsExpanded;
             if (t.Terminal.IsExpanded)
@@ -126,22 +137,27 @@ public partial class MainWindow : Window
                 FocusConsoleInput();
             }
 
-            e.Handled = true;
+            return true;
         }
-        else if (ctrl && shift && e.Key == Key.N && Tab is { Files.NewFolderCommand: var newFolder } && newFolder.CanExecute(null))
+
+        if (ctrl && shift && key == Key.N && Tab is { Files.NewFolderCommand: var newFolder } && newFolder.CanExecute(null))
         {
             newFolder.Execute(null);
-            e.Handled = true;
+            return true;
         }
-        else if (e.Key == Key.Tab && (Keyboard.Modifiers is ModifierKeys.None or ModifierKeys.Shift) && !_focus.KeepsDefaultTab())
+
+        if (key == Key.Tab && (Keyboard.Modifiers is ModifierKeys.None or ModifierKeys.Shift) && !_focus.KeepsDefaultTab())
         {
             _focus.Move(shift ? -1 : 1);
-            e.Handled = true;
+            return true;
         }
-        else if (_focus.HandleArrowKey(e.Key))
+
+        if (_focus.HandleArrowKey(key))
         {
-            e.Handled = true;
+            return true;
         }
+
+        return false;
     }
 
     private void CycleTabs(int step)
