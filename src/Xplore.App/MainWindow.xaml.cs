@@ -330,6 +330,7 @@ public partial class MainWindow : Window
             if (window.ShowDialog() == true)
             {
                 await SettingsStore.SaveAsync(window.Result);
+                Tab?.RefreshCommand.Execute(null);
                 return;
             }
 

@@ -29,6 +29,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.Resources>
                 <Style TargetType="TextBlock">
@@ -53,20 +54,21 @@
 
             <CheckBox x:Name="ForwardSlashesBox" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Content="{l:Loc Settings.ForwardSlashes}"/>
             <CheckBox x:Name="NewFolderPromptBox" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Content="{l:Loc Settings.NewFolderPrompt}"/>
+            <CheckBox x:Name="FoldersFirstBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="{l:Loc Settings.FoldersFirst}"/>
 
-            <TextBlock Grid.Row="3" Text="{l:Loc Settings.HistoryDepth}"/>
-            <TextBox x:Name="HistoryDepthBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" TextChanged="Input_Changed"/>
+            <TextBlock Grid.Row="4" Text="{l:Loc Settings.HistoryDepth}"/>
+            <TextBox x:Name="HistoryDepthBox" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" TextChanged="Input_Changed"/>
 
-            <TextBlock Grid.Row="4" Text="{l:Loc Settings.PrefixTimeout}"/>
-            <TextBox x:Name="PrefixTimeoutBox" Grid.Row="4" Grid.Column="1" TextChanged="Input_Changed"/>
-            <TextBlock Grid.Row="4" Grid.Column="2" Text="{l:Loc Settings.Milliseconds}" Margin="6,0,0,10"/>
+            <TextBlock Grid.Row="5" Text="{l:Loc Settings.PrefixTimeout}"/>
+            <TextBox x:Name="PrefixTimeoutBox" Grid.Row="5" Grid.Column="1" TextChanged="Input_Changed"/>
+            <TextBlock Grid.Row="5" Grid.Column="2" Text="{l:Loc Settings.Milliseconds}" Margin="6,0,0,10"/>
 
-            <TextBlock Grid.Row="5" Text="{l:Loc Settings.StartLocation}"/>
-            <ComboBox x:Name="StartTypeBox" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" DisplayMemberPath="Label" SelectedValuePath="Value" SelectionChanged="StartType_Changed"/>
+            <TextBlock Grid.Row="6" Text="{l:Loc Settings.StartLocation}"/>
+            <ComboBox x:Name="StartTypeBox" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" DisplayMemberPath="Label" SelectedValuePath="Value" SelectionChanged="StartType_Changed"/>
 
-            <TextBlock Grid.Row="6" Text="{l:Loc Settings.CustomPath}"/>
-            <TextBox x:Name="CustomPathBox" Grid.Row="6" Grid.Column="1" Margin="0,0,8,0"/>
-            <Button x:Name="BrowseButton" Grid.Row="6" Grid.Column="2" Content="{l:Loc Common.Browse}" Padding="10,0" Click="Browse_Click"/>
+            <TextBlock Grid.Row="7" Text="{l:Loc Settings.CustomPath}"/>
+            <TextBox x:Name="CustomPathBox" Grid.Row="7" Grid.Column="1" Margin="0,0,8,0"/>
+            <Button x:Name="BrowseButton" Grid.Row="7" Grid.Column="2" Content="{l:Loc Common.Browse}" Padding="10,0" Click="Browse_Click"/>
         </Grid>
     </DockPanel>
 </Window>

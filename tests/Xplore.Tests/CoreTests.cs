@@ -1,6 +1,7 @@
 using Xplore.Core.Model;
 using Xplore.Core.Navigation;
 using Xplore.Core.Operations;
+using Xplore.Core.Settings;
 using Xplore.Core.Shell;
 
 namespace Xplore.Tests;
@@ -35,15 +36,23 @@ public class FsSortingTests
 
     [Fact]
     public void FoldersFirstEvenWhenDescending() =>
-        Assert.Equal(["z", "b.txt"], FsSorting.Sort([F("b.txt"), F("z", dir: true)], SortColumn.Name, false).Select(e => e.Name));
+        Assert.Equal(["z", "b.txt"], new FsSorting(foldersFirst: true).Sort([F("b.txt"), F("z", dir: true)], SortColumn.Name, false).Select(e => e.Name));
+
+    [Fact]
+    public void FoldersAndFilesMixWhenFoldersAreNotFirst() =>
+        Assert.Equal(["a.txt", "b", "c.txt"], new FsSorting(foldersFirst: false).Sort([F("c.txt"), F("b", dir: true), F("a.txt")], SortColumn.Name, true).Select(e => e.Name));
+
+    [Fact]
+    public void FoldersFirstIsTheDefaultSetting() =>
+        Assert.True(AppSettings.Default.FoldersFirst);
 
     [Fact]
     public void NaturalNameOrder() =>
-        Assert.Equal(["a2", "a10"], FsSorting.Sort([F("a10"), F("a2")], SortColumn.Name, true).Select(e => e.Name));
+        Assert.Equal(["a2", "a10"], new FsSorting(foldersFirst: true).Sort([F("a10"), F("a2")], SortColumn.Name, true).Select(e => e.Name));
 
     [Fact]
     public void SizeDescending() =>
-        Assert.Equal(["big", "small"], FsSorting.Sort([F("small", 1), F("big", 9)], SortColumn.Size, false).Select(e => e.Name));
+        Assert.Equal(["big", "small"], new FsSorting(foldersFirst: true).Sort([F("small", 1), F("big", 9)], SortColumn.Size, false).Select(e => e.Name));
 }
 
 public class FileSystemServiceTests : IDisposable
@@ -83,8 +92,8 @@ public class FileOperationsTests : IDisposable
     [Fact]
     public void NewFoldersGetUniqueNames()
     {
-        Assert.Equal("New folder", Path.GetFileName(Xplore.Core.Operations.FileOperations.CreateFolder(_dir)));
-        Assert.Equal("New folder (2)", Path.GetFileName(Xplore.Core.Operations.FileOperations.CreateFolder(_dir)));
+        Assert.Equal("New folder", Path.GetFileName(FileOperations.CreateFolder(_dir)));
+        Assert.Equal("New folder (2)", Path.GetFileName(FileOperations.CreateFolder(_dir)));
     }
 
     [Fact]
@@ -93,10 +102,10 @@ public class FileOperationsTests : IDisposable
         var a = Path.Combine(_dir, "a.txt");
         File.WriteAllText(a, "x");
         File.WriteAllText(Path.Combine(_dir, "b.txt"), "y");
-        var upper = Xplore.Core.Operations.FileOperations.Rename(a, "A.txt");
+        var upper = FileOperations.Rename(a, "A.txt");
         Assert.Contains(Directory.EnumerateFiles(_dir).Select(Path.GetFileName), n => n == "A.txt");
-        Assert.Throws<IOException>(() => Xplore.Core.Operations.FileOperations.Rename(upper, "b.txt"));
-        Assert.Throws<ArgumentException>(() => Xplore.Core.Operations.FileOperations.Rename(upper, "a?b"));
+        Assert.Throws<IOException>(() => FileOperations.Rename(upper, "b.txt"));
+        Assert.Throws<ArgumentException>(() => FileOperations.Rename(upper, "a?b"));
     }
 
     [Fact]
@@ -105,13 +114,13 @@ public class FileOperationsTests : IDisposable
         var sub = Directory.CreateDirectory(Path.Combine(_dir, "sub")).FullName;
         var f = Path.Combine(_dir, "f.txt");
         File.WriteAllText(f, "x");
-        var copy = Xplore.Core.Operations.FileOperations.Transfer([f], sub, move: false).Single();
+        var copy = FileOperations.Transfer([f], sub, move: false).Single();
         Assert.True(File.Exists(copy) && File.Exists(f));
-        var dup = Xplore.Core.Operations.FileOperations.Transfer([f], _dir, move: false).Single();
+        var dup = FileOperations.Transfer([f], _dir, move: false).Single();
         Assert.Equal("f - Copy.txt", Path.GetFileName(dup));
-        Xplore.Core.Operations.FileOperations.Transfer([dup], sub, move: true);
+        FileOperations.Transfer([dup], sub, move: true);
         Assert.False(File.Exists(dup));
-        Assert.Throws<IOException>(() => Xplore.Core.Operations.FileOperations.Transfer([_dir], sub, move: false));
+        Assert.Throws<IOException>(() => FileOperations.Transfer([_dir], sub, move: false));
     }
 }
 

@@ -26,14 +26,16 @@ public sealed record OpenWithApp(string Name, string Path, string? Icon = null)
 // NewFolderPrompt: ask for the name of a new folder before creating it instead of creating it and renaming in place;
 // StartLocation: what the app opens at startup;
 // PrefixTimeoutMs: max pause in milliseconds between typed characters of one prefix search in the details view;
-// Language: culture name of the UI language such as "ru", null for the language of the operating system.
+// Language: culture name of the UI language such as "ru", null for the language of the operating system;
+// FoldersFirst: list folders before files in the details view instead of sorting them together.
 public sealed record AppSettings(
     int HistoryDepth = AppSettings.DefaultHistoryDepth,
     bool ForwardSlashes = false,
     bool NewFolderPrompt = false,
     StartLocation? StartLocation = null,
     int PrefixTimeoutMs = AppSettings.DefaultPrefixTimeoutMs,
-    string? Language = null)
+    string? Language = null,
+    bool FoldersFirst = true)
 {
     public const int DefaultHistoryDepth = 100;
     public const int DefaultPrefixTimeoutMs = 1000;

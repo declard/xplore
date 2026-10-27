@@ -5,6 +5,7 @@ using Xplore.Core.Localization;
 using Xplore.Core.Locations;
 using Xplore.Core.Model;
 using Xplore.Core.Navigation;
+using Xplore.Core.Settings;
 using Xplore.Core.Shell;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -39,6 +40,7 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
     private List<FsEntry> _entries = [];
     private SortColumn _sortColumn = SortColumn.Name;
     private bool _sortAscending = true;
+    private bool _foldersFirst = true;
     private IReadOnlyList<ItemViewModel> _selection = [];
     private readonly Subject<ShowRequest> _requests = new();
     private readonly IDisposable _showing;
@@ -221,7 +223,7 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
                 return await _fs.StorageAsync();
 
             var folders = (await _fs.ListAsync(path)).Where(e => e.IsDirectory);
-            return [.. FsSorting.Sort(folders, SortColumn.Name, true)];
+            return [.. new FsSorting(foldersFirst: true).Sort(folders, SortColumn.Name, true)];
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -314,6 +316,8 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
         var changedFolder = target.Current != CurrentPath;
         _history = target;
         _entries = entries;
+        _foldersFirst = (await SettingsStore.LoadAsync()).FoldersFirst;
+        ct.ThrowIfCancellationRequested();
         Address.Reset(target.Current);
         Rebuild(request.Select ?? []);
         if (changedFolder || !_watcher.IsWatching)
@@ -386,7 +390,7 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
     {
         var selected = select.ToHashSet(StringComparer.OrdinalIgnoreCase);
         Items.Clear();
-        var ordered = CurrentPath is null ? _entries : FsSorting.Sort(_entries, _sortColumn, _sortAscending);
+        var ordered = CurrentPath is null ? _entries : new FsSorting(_foldersFirst).Sort(_entries, _sortColumn, _sortAscending);
         foreach (var e in ordered)
         {
             Items.Add(new ItemViewModel(e) { IsSelected = selected.Contains(e.Path) });

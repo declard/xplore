@@ -36,6 +36,7 @@ Settings are stored as YAML in `%APPDATA%\Xplore\settings.yaml`; omitted keys ta
 | `Language` | system language | Culture name of the UI language, such as `de` or `pt` (applies after a restart) |
 | `ForwardSlashes` | `false` | Show and copy paths with `/` instead of `\` |
 | `NewFolderPrompt` | `false` | Ask for the name when creating a new folder |
+| `FoldersFirst` | `true` | List folders before files; `false` sorts them together |
 | `HistoryDepth` | `100` | Maximum length of the undo history path |
 | `PrefixTimeoutMs` | `1000` | Longest pause between typed characters of one type-ahead search |
 | `StartLocation` | `Default` | What opens at startup: `Default` (drive list), `Restore` (previous tabs) or `Custom` (a folder) |

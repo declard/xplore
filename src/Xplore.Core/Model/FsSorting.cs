@@ -2,12 +2,12 @@ using System.Runtime.InteropServices;
 
 namespace Xplore.Core.Model;
 
-public static class FsSorting
+public class FsSorting(bool foldersFirst)
 {
     [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
     private static extern int StrCmpLogicalW(string x, string y);
 
-    public static IEnumerable<FsEntry> Sort(IEnumerable<FsEntry> entries, SortColumn column, bool ascending)
+    public IEnumerable<FsEntry> Sort(IEnumerable<FsEntry> entries, SortColumn column, bool ascending)
     {
         var sign = ascending ? 1 : -1;
         Func<FsEntry, FsEntry, int> byColumn = column switch
@@ -19,7 +19,7 @@ public static class FsSorting
         };
         var comparer = Comparer<FsEntry>.Create((a, b) =>
         {
-            if (a.IsDirectory != b.IsDirectory)
+            if (foldersFirst && a.IsDirectory != b.IsDirectory)
                 return a.IsDirectory ? -1 : 1;
 
             var primary = sign * byColumn(a, b);

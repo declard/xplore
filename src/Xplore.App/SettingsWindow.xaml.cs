@@ -22,6 +22,7 @@ public partial class SettingsWindow : Window
         LanguageBox.SelectedValue = settings.Language ?? "";
         ForwardSlashesBox.IsChecked = settings.ForwardSlashes;
         NewFolderPromptBox.IsChecked = settings.NewFolderPrompt;
+        FoldersFirstBox.IsChecked = settings.FoldersFirst;
         HistoryDepthBox.Text = settings.HistoryDepth.ToString(CultureInfo.InvariantCulture);
         PrefixTimeoutBox.Text = settings.PrefixTimeoutMs.ToString(CultureInfo.InvariantCulture);
         StartTypeBox.ItemsSource = Choice<StartMode>.All;
@@ -37,6 +38,7 @@ public partial class SettingsWindow : Window
         Language = LanguageBox.SelectedValue is string { Length: > 0 } code ? code : null,
         ForwardSlashes = ForwardSlashesBox.IsChecked == true,
         NewFolderPrompt = NewFolderPromptBox.IsChecked == true,
+        FoldersFirst = FoldersFirstBox.IsChecked == true,
         HistoryDepth = int.Parse(HistoryDepthBox.Text.Trim(), CultureInfo.InvariantCulture),
         PrefixTimeoutMs = int.Parse(PrefixTimeoutBox.Text.Trim(), CultureInfo.InvariantCulture),
         StartLocation = new((StartMode)StartTypeBox.SelectedValue, CustomPathBox.Text.Trim() is { Length: > 0 } path ? path : null),

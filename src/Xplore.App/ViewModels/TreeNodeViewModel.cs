@@ -149,7 +149,7 @@ public sealed class TreeNodeViewModel : ObservableObject
         {
             var probed = await Task.Run(async () => (isRoot
                     ? await fs.StorageAsync()
-                    : [.. FsSorting.Sort(await SubfoldersAsync(fs), SortColumn.Name, true)])
+                    : [.. new FsSorting(foldersFirst: true).Sort(await SubfoldersAsync(fs), SortColumn.Name, true)])
                 .Select(e => (
                     Entry: e,
                     Icon: IconCache.For(e),
