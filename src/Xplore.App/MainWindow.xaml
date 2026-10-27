@@ -501,7 +501,7 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <Image Source="{Binding Icon}" Width="16" Height="16" Margin="0,0,6,0"/>
-                                            <TextBlock Text="{Binding Name}" Style="{StaticResource NameText}" Tag="NameCell"/>
+                                            <TextBlock Text="{Binding DisplayName}" Style="{StaticResource NameText}" Tag="NameCell"/>
                                             <TextBox Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}" MinWidth="160" Padding="2,0" Height="18" Margin="0,-2" VerticalContentAlignment="Center"
                                                      Visibility="{Binding IsRenaming, Converter={StaticResource BoolToVis}}"
                                                      PreviewKeyDown="Rename_KeyDown"

@@ -11,6 +11,8 @@ public sealed class ItemViewModel(FsEntry entry, TimestampFormat time) : Observa
     public ImageSource? Icon { get; } = IconCache.For(entry);
 
     public string Name => Entry.Name;
+
+    public string DisplayName => !Entry.IsDirectory && IsLnk(Name) ? Path.GetFileNameWithoutExtension(Name) : Name;
     public string TypeName => Entry.TypeName;
     public string ModifiedText => Entry.Modified is { } m ? time.Short(m) : "";
     public string SizeText => Entry.Size is { } s ? Loc.Format("Size.Kb", Math.Max(1, (s + 1023) / 1024)) : "";
@@ -40,4 +42,7 @@ public sealed class ItemViewModel(FsEntry entry, TimestampFormat time) : Observa
         get;
         set => Set(ref field, value);
     } = entry.Name;
+
+    private static bool IsLnk(string name) =>
+        Path.GetExtension(name).Equals(".lnk", StringComparison.OrdinalIgnoreCase);
 }

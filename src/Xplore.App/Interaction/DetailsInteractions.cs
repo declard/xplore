@@ -345,7 +345,7 @@ public sealed class DetailsInteractions
             return;
 
         var last = tab.Items.Select((it, i) => (it, i)).LastOrDefault(p => p.it.IsSelected, (it: null!, i: -1)).i;
-        var at = PrefixSearch.IndexOf(tab.Items.Select(i => i.Name).ToList(), prefix, prefix.Length > 1 ? Math.Max(last, 0) : last + 1);
+        var at = PrefixSearch.IndexOf(tab.Items.Select(i => i.DisplayName).ToList(), prefix, prefix.Length > 1 ? Math.Max(last, 0) : last + 1);
         if (at < 0)
             return;
 
