@@ -486,7 +486,7 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <ListView x:Name="Details" BorderThickness="0" ItemsSource="{Binding Items}"
+                <ListView x:Name="Details" BorderThickness="0" FocusVisualStyle="{x:Null}" ItemsSource="{Binding Items}"
                           SelectionMode="Extended" ItemContainerStyle="{StaticResource ListItem}" AllowDrop="True"
                           SelectionChanged="Details_SelectionChanged" GridViewColumnHeader.Click="Header_Click"
                           ContextMenuOpening="Details_ContextMenuOpening" PreviewKeyDown="Details_PreviewKeyDown" PreviewTextInput="Details_TextInput"
