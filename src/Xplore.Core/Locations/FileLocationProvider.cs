@@ -42,10 +42,12 @@ public sealed class FileLocationProvider : ILocationProvider
 
     public static FsEntry ToEntry(FileSystemInfo i) => i switch
     {
-        DirectoryInfo d => new(d.FullName, d.Name, true, d.LastWriteTime, null, Loc.Get("Type.FileFolder")),
-        FileInfo f => new(f.FullName, f.Name, false, f.LastWriteTime, f.Length, Shell.ShellInfo.TypeName(f.Name)),
+        DirectoryInfo d => new(d.FullName, d.Name, true, d.LastWriteTime, null, Loc.Get("Type.FileFolder"), IsHidden(d)),
+        FileInfo f => new(f.FullName, f.Name, false, f.LastWriteTime, f.Length, Shell.ShellInfo.TypeName(f.Name), IsHidden(f)),
         _ => throw new NotSupportedException(),
     };
+
+    private static bool IsHidden(FileSystemInfo i) => i.Attributes.HasFlag(FileAttributes.Hidden);
 
     private static string DriveLabel(DriveInfo d) =>
         $"{(string.IsNullOrEmpty(d.VolumeLabel) ? Loc.Get("Type.LocalDisk") : d.VolumeLabel)} ({d.Name.TrimEnd('\\')})";

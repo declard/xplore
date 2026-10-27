@@ -31,7 +31,7 @@ public sealed class FolderWatcher : IDisposable
         {
             var watcher = new FileSystemWatcher(path)
             {
-                NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite | NotifyFilters.Size,
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.Attributes,
             };
             void Changed(object sender, FileSystemEventArgs e) => Application.Current?.Dispatcher.BeginInvoke(Restart);
             watcher.Created += Changed;

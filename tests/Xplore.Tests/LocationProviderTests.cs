@@ -34,6 +34,26 @@ public class LocationProviderTests
         Assert.Equal(LocationCapabilities.None, _fs.CapabilitiesOf(null));
 
     [Fact]
+    public async Task EntriesCarryTheHiddenAttribute()
+    {
+        var dir = Directory.CreateTempSubdirectory("xp-hidden").FullName;
+        try
+        {
+            File.WriteAllText(Path.Combine(dir, "plain.txt"), "");
+            File.WriteAllText(Path.Combine(dir, "secret.txt"), "");
+            File.SetAttributes(Path.Combine(dir, "secret.txt"), FileAttributes.Hidden);
+
+            var entries = (await _fs.ListAsync(dir)).ToDictionary(e => e.Name, e => e.IsHidden);
+
+            Assert.Equal((false, true), (entries["plain.txt"], entries["secret.txt"]));
+        }
+        finally
+        {
+            Directory.Delete(dir, true);
+        }
+    }
+
+    [Fact]
     public async Task StorageListsTheDesktopTheDrivesAndTheRecycleBin()
     {
         var storage = await _fs.StorageAsync();

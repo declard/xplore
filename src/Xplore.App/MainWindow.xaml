@@ -500,8 +500,8 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <Image Source="{Binding Icon}" Width="16" Height="16" Margin="0,0,6,0"/>
-                                            <TextBlock Text="{Binding DisplayName}" Style="{StaticResource NameText}" Tag="NameCell"/>
+                                            <Image Source="{Binding Icon}" Opacity="{Binding Opacity}" Width="16" Height="16" Margin="0,0,6,0"/>
+                                            <TextBlock Text="{Binding DisplayName}" Opacity="{Binding Opacity}" Style="{StaticResource NameText}" Tag="NameCell"/>
                                             <TextBox Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}" MinWidth="160" Padding="2,0" Height="18" Margin="0,-2" VerticalContentAlignment="Center"
                                                      Visibility="{Binding IsRenaming, Converter={StaticResource BoolToVis}}"
                                                      PreviewKeyDown="Rename_KeyDown"

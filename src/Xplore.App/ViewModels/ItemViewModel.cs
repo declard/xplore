@@ -13,6 +13,7 @@ public sealed class ItemViewModel(FsEntry entry, TimestampFormat time) : Observa
     public string Name => Entry.Name;
 
     public string DisplayName => !Entry.IsDirectory && IsLnk(Name) ? Path.GetFileNameWithoutExtension(Name) : Name;
+    public double Opacity => Entry.IsHidden ? 0.5 : 1;
     public string TypeName => Entry.TypeName;
     public string ModifiedText => Entry.Modified is { } m ? time.Short(m) : "";
     public string SizeText => Entry.Size is { } s ? Loc.Format("Size.Kb", Math.Max(1, (s + 1023) / 1024)) : "";
