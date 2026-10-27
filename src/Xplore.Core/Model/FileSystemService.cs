@@ -25,10 +25,10 @@ public interface IFileSystemService
     IAsyncEnumerable<FsEntry> Search(string path, string pattern, CancellationToken ct);
 }
 
-public sealed class FileSystemService : IFileSystemService
+public sealed class FileSystemService(FileLocationProvider files, IEnumerable<ILocationProvider> virtuals) : IFileSystemService
 {
-    private readonly FileLocationProvider _files = new();
-    private readonly ILocationProvider[] _virtual = [new RecycleBinLocationProvider()];
+    private readonly FileLocationProvider _files = files;
+    private readonly ILocationProvider[] _virtual = [.. virtuals];
 
     private ILocationProvider[] AllProviders => [_files, .. _virtual];
 

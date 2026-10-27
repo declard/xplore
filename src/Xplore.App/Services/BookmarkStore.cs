@@ -3,13 +3,13 @@ using Xplore.Core.Settings;
 
 namespace Xplore.App;
 
-public sealed class BookmarkStore(IEnumerable<Bookmark> initial)
+public sealed class BookmarkStore(BookmarkRegistry registry, IEnumerable<Bookmark> initial)
 {
     public ObservableCollection<Bookmark> Items { get; } = new(initial);
 
     public event Action? Changed;
 
-    public static async Task<BookmarkStore> LoadAsync() => new(await BookmarkRegistry.LoadAsync());
+    public static async Task<BookmarkStore> LoadAsync(BookmarkRegistry registry) => new(registry, await registry.LoadAsync());
 
     public bool Contains(string path) => Items.Any(b => Same(b.Path, path));
 
@@ -25,7 +25,7 @@ public sealed class BookmarkStore(IEnumerable<Bookmark> initial)
         }
 
         Changed?.Invoke();
-        return BookmarkRegistry.SaveAsync(Items.ToList());
+        return registry.SaveAsync(Items.ToList());
     }
 
     private static bool Same(string a, string b) =>
@@ -38,7 +38,7 @@ public sealed class BookmarkStore(IEnumerable<Bookmark> initial)
 
         Items[Items.IndexOf(existing)] = existing with { Name = name };
         Changed?.Invoke();
-        return BookmarkRegistry.SaveAsync(Items.ToList());
+        return registry.SaveAsync(Items.ToList());
     }
 
     private static string NameOf(string path) =>

@@ -10,12 +10,14 @@ namespace Xplore.App.ViewModels;
 public sealed class OpenWithService
 {
     private readonly IUserPrompts _prompts;
+    private readonly OpenWithStore _store;
     private readonly OperationRunner _runner;
     private readonly Func<IReadOnlyList<ItemViewModel>> _selection;
 
-    public OpenWithService(IUserPrompts prompts, OperationRunner runner, Func<IReadOnlyList<ItemViewModel>> selection)
+    public OpenWithService(IUserPrompts prompts, OpenWithStore store, OperationRunner runner, Func<IReadOnlyList<ItemViewModel>> selection)
     {
         _prompts = prompts;
+        _store = store;
         _runner = runner;
         _selection = selection;
         DialogCommand = new AsyncRelayCommand(OpenDialog, () => Targets.Count > 0);
@@ -24,11 +26,11 @@ public sealed class OpenWithService
     public ICommand DialogCommand { get; }
 
     public async Task<IReadOnlyList<OpenWithApp>> QuickAppsAsync() =>
-        Targets is [var first, ..] ? await OpenWithStore.ForAsync(first) : [];
+        Targets is [var first, ..] ? await _store.ForAsync(first) : [];
 
     public Task LaunchAsync(OpenWithApp app) => _runner.Run(() => AssocHandlers.Launch(app, Targets));
 
-    public Task ForgetAsync(OpenWithApp app) => OpenWithStore.ForgetAsync(_selection()[0].Entry.Path, app);
+    public Task ForgetAsync(OpenWithApp app) => _store.ForgetAsync(_selection()[0].Entry.Path, app);
 
     // The selected files when there are only files and they all share one "Open with" key (extension or file name).
     private IReadOnlyList<string> Targets =>
@@ -50,6 +52,6 @@ public sealed class OpenWithService
             return;
 
         AssocHandlers.Launch(app, files);
-        await OpenWithStore.RememberAsync(files[0], app);
+        await _store.RememberAsync(files[0], app);
     });
 }

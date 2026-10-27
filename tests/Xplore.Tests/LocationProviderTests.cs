@@ -5,7 +5,7 @@ namespace Xplore.Tests;
 
 public class LocationProviderTests
 {
-    private readonly FileSystemService _fs = new();
+    private readonly FileSystemService _fs = TestFileSystem.Create();
 
     [Theory]
     [InlineData("Recycle Bin")]

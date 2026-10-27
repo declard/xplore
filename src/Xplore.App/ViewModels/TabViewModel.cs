@@ -46,7 +46,15 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
     private readonly IDisposable _showing;
     private int _loading;
 
-    public TabViewModel(IFileSystemService fs, IUserPrompts prompts, BookmarkStore bookmarks, ActionHistoryStore actions, ISettings settings, PathFormat format, string? location = null)
+    public TabViewModel(
+        IFileSystemService fs,
+        IUserPrompts prompts,
+        BookmarkStore bookmarks,
+        ActionHistoryStore actions,
+        OpenWithStore openWith,
+        ISettings settings,
+        PathFormat format,
+        string? location = null)
     {
         _fs = fs;
         _prompts = prompts;
@@ -58,7 +66,7 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
         Address = new AddressBar(fs, prompts, format, () => CurrentPath, NavigateToAsync);
         Search = new FolderSearch(fs, prompts, () => CurrentPath, () => ShowAsync(_history));
         Files = new FileActions(this, prompts, actions, _runner, settings, format);
-        OpenWith = new OpenWithService(prompts, _runner, () => _selection);
+        OpenWith = new OpenWithService(prompts, openWith, _runner, () => _selection);
         _watcher.Elapsed += () => RefreshFromWatcherAsync().Forget();
         Search.Started += OnSearchStarted;
         Search.Found += OnSearchFound;

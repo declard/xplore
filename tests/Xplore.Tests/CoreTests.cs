@@ -65,7 +65,7 @@ public class FileSystemServiceTests : IDisposable
     {
         Directory.CreateDirectory(Path.Combine(_dir, "sub"));
         File.WriteAllText(Path.Combine(_dir, "a.txt"), "hi");
-        var r = await new FileSystemService().ListAsync(_dir);
+        var r = await TestFileSystem.Create().ListAsync(_dir);
         Assert.Contains(r, e => e.Name == "sub" && e.IsDirectory);
         Assert.Contains(r, e => e.Name == "a.txt" && e.Size == 2);
     }
@@ -75,7 +75,7 @@ public class FileSystemServiceTests : IDisposable
     {
         Directory.CreateDirectory(Path.Combine(_dir, "sub"));
         File.WriteAllText(Path.Combine(_dir, "sub", "needle.txt"), "");
-        var svc = new FileSystemService();
+        var svc = TestFileSystem.Create();
         Assert.Single(await svc.Search(_dir, "**/needle*", CancellationToken.None).ToListAsync());
         using var cts = new CancellationTokenSource();
         cts.Cancel();

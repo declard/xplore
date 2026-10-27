@@ -26,11 +26,9 @@ public sealed record StartTabs(IReadOnlyList<string?> Locations, int Selected)
     private static string? Existing(string? path) => !string.IsNullOrWhiteSpace(path) && Directory.Exists(path) ? path : null;
 }
 
-public static class SessionStore
+public sealed class SessionStore(string filePath)
 {
-    public static string FilePath { get; } = AppFolder.File("session.yaml");
+    public Task<Session?> LoadAsync() => YamlFile.ReadAsync<Session>(filePath);
 
-    public static Task<Session?> LoadAsync() => YamlFile.ReadAsync<Session>(FilePath);
-
-    public static Task SaveAsync(Session session) => YamlFile.WriteAsync(FilePath, session);
+    public Task SaveAsync(Session session) => YamlFile.WriteAsync(filePath, session);
 }

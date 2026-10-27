@@ -1,30 +1,26 @@
 #pragma warning disable S2971
 
-using Xplore.Core.Localization;
-using Xplore.Core.Model;
-using Xplore.Core.Settings;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using Xplore.Core.Settings;
 
 namespace Xplore.App.ViewModels;
 
 public sealed class MainViewModel : ObservableObject
 {
-    private readonly IFileSystemService _fs = new FileSystemService();
-    private readonly IUserPrompts _prompts = new WpfPrompts();
-    private readonly BookmarkStore _bookmarks;
     private readonly ActionHistoryStore _history;
+    private readonly TabFactory _tabs;
+    private readonly SessionStore _sessions;
 
-    private MainViewModel(ISettings settings, BookmarkStore bookmarks, StartTabs start)
+    public MainViewModel(ISettings settings, PathFormat format, ActionHistoryStore history, TabFactory tabs, SessionStore sessions, StartTabs start)
     {
         Settings = settings;
-        PathFormat = new(settings);
-        _bookmarks = bookmarks;
-        _history = new ActionHistoryStore(_prompts, settings, PathFormat)
-        {
-            FilesChanged = ReloadAllTabsAsync
-        };
+        PathFormat = format;
+        _history = history;
+        _tabs = tabs;
+        _sessions = sessions;
+        _history.FilesChanged = ReloadAllTabsAsync;
         settings.Changed += _ => ReloadAllTabsAsync().Forget();
         UndoCommand = new AsyncRelayCommand(_history.UndoAsync);
         RedoCommand = new AsyncRelayCommand(_history.RedoAsync);
@@ -32,16 +28,6 @@ public sealed class MainViewModel : ObservableObject
         CloseTabCommand = new RelayCommand(p => CloseTab((TabViewModel)p!));
         start.Locations.ToList().ForEach(l => NewTab(l));
         SelectedTab = Tabs[start.Selected];
-    }
-
-    public static async Task<MainViewModel> CreateAsync()
-    {
-        var settings = new SettingsService();
-        await settings.ReloadAsync();
-        Loc.Apply(settings.Current.Language);
-        var bookmarks = await BookmarkStore.LoadAsync();
-        var session = settings.Current.StartLocation?.Type == StartMode.Restore ? await SessionStore.LoadAsync() : null;
-        return new(settings, bookmarks, await Task.Run(() => StartTabs.Resolve(settings.Current, session)));
     }
 
     public ISettings Settings { get; }
@@ -73,12 +59,12 @@ public sealed class MainViewModel : ObservableObject
         if (Settings.Current.StartLocation?.Type != StartMode.Restore)
             return;
 
-        await SessionStore.SaveAsync(Session.Of(Tabs.Select(t => t.CurrentPath), Tabs.IndexOf(SelectedTab!)));
+        await _sessions.SaveAsync(Session.Of(Tabs.Select(t => t.CurrentPath), Tabs.IndexOf(SelectedTab!)));
     }
 
     private void NewTab(string? location = null, bool select = true)
     {
-        var tab = new TabViewModel(_fs, _prompts, _bookmarks, _history, Settings, PathFormat, location);
+        var tab = _tabs.Create(location);
         Tabs.Add(tab);
         if (select)
         {
