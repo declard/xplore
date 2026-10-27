@@ -28,6 +28,7 @@ Console.StartFailed: "PowerShell не можа да бъде стартиран:
 Default.CopyName: "{0} - копие"
 Default.NewFile: "Нов текстов документ"
 Default.NewFolder: "Нова папка"
+Desktop.Name: "Работен плот"
 Default.ShortcutName: "{0} - пряк път"
 Delete.Confirm.PermanentMany: "Наистина ли искате окончателно да изтриете тези {0:N0} елемента?"
 Delete.Confirm.PermanentOne: "Наистина ли искате окончателно да изтриете „{0}“?"

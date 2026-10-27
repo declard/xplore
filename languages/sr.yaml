@@ -28,6 +28,7 @@ Console.StartFailed: "Покретање PowerShell-а није успело: {0
 Default.CopyName: "{0} - копија"
 Default.NewFile: "Нови текстуални документ"
 Default.NewFolder: "Нова фасцикла"
+Desktop.Name: "Радна површина"
 Default.ShortcutName: "{0} - пречица"
 Delete.Confirm.PermanentMany: "Да ли сте сигурни да желите трајно да избришете ове ставке ({0:N0})?"
 Delete.Confirm.PermanentOne: "Да ли сте сигурни да желите трајно да избришете „{0}“?"

@@ -26,13 +26,19 @@ public sealed class FileLocationProvider : ILocationProvider
         }
     }
 
-    public Task<IReadOnlyList<FsEntry>> StorageEntriesAsync(CancellationToken ct = default) =>
+    public async Task<IReadOnlyList<FsEntry>> StorageEntriesAsync(CancellationToken ct = default) =>
+        [Desktop(), .. await DrivesAsync(ct)];
+
+    public Task<IReadOnlyList<FsEntry>> DrivesAsync(CancellationToken ct = default) =>
         Task.Run<IReadOnlyList<FsEntry>>(() =>
             DriveInfo.GetDrives()
                 .Where(d => d.IsReady)
                 .OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase)
                 .Select(d => new FsEntry(d.Name, DriveLabel(d), true, null, null, Loc.Get("Type.LocalDisk")))
                 .ToList(), ct);
+
+    private static FsEntry Desktop() =>
+        new(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Loc.Get("Desktop.Name"), true, null, null, Loc.Get("Type.FileFolder"));
 
     public static FsEntry ToEntry(FileSystemInfo i) => i switch
     {

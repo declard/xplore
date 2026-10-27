@@ -28,6 +28,7 @@ Console.StartFailed: "PowerShell शुरू नहीं किया जा �
 Default.CopyName: "{0} - कॉपी"
 Default.NewFile: "नया टेक्स्ट दस्तावेज़"
 Default.NewFolder: "नया फ़ोल्डर"
+Desktop.Name: "डेस्कटॉप"
 Default.ShortcutName: "{0} - शॉर्टकट"
 Delete.Confirm.PermanentMany: "क्या आप वाकई इन {0:N0} आइटम को स्थायी रूप से हटाना चाहते हैं?"
 Delete.Confirm.PermanentOne: "क्या आप वाकई '{0}' को स्थायी रूप से हटाना चाहते हैं?"

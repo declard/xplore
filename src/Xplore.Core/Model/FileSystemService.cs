@@ -32,7 +32,7 @@ public sealed class FileSystemService(FileLocationProvider files, IEnumerable<IL
 
     private ILocationProvider[] AllProviders => [_files, .. _virtual];
 
-    public Task<IReadOnlyList<FsEntry>> DrivesAsync(CancellationToken ct = default) => _files.StorageEntriesAsync(ct);
+    public Task<IReadOnlyList<FsEntry>> DrivesAsync(CancellationToken ct = default) => _files.DrivesAsync(ct);
 
     public async Task<IReadOnlyList<FsEntry>> StorageAsync(CancellationToken ct = default) =>
         [.. (await Task.WhenAll(AllProviders.Select(p => p.StorageEntriesAsync(ct)))).SelectMany(e => e)];

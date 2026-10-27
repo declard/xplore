@@ -188,6 +188,9 @@ public sealed class TreeNodeViewModel : ObservableObject
     {
         try
         {
+            if (System.IO.Path.GetPathRoot(path) != path)
+                return null;
+
             var drive = new DriveInfo(path);
             if (!drive.IsReady || drive.TotalSize <= 0)
                 return null;

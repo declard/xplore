@@ -28,6 +28,7 @@ Console.StartFailed: "PowerShell-ის გაშვება ვერ მო�
 Default.CopyName: "{0} - ასლი"
 Default.NewFile: "ახალი ტექსტური დოკუმენტი"
 Default.NewFolder: "ახალი საქაღალდე"
+Desktop.Name: "სამუშაო მაგიდა"
 Default.ShortcutName: "{0} - მალსახმობი"
 Delete.Confirm.PermanentMany: "ნამდვილად გსურთ სამუდამოდ წაშალოთ ეს {0:N0} ელემენტი?"
 Delete.Confirm.PermanentOne: "ნამდვილად გსურთ სამუდამოდ წაშალოთ '{0}'?"

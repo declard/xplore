@@ -28,6 +28,7 @@ Console.StartFailed: "PowerShell іске қосу мүмкін болмады: 
 Default.CopyName: "{0} - көшірме"
 Default.NewFile: "Жаңа мәтіндік құжат"
 Default.NewFolder: "Жаңа қалта"
+Desktop.Name: "Жұмыс үстелі"
 Default.ShortcutName: "{0} - таңбаша"
 Delete.Confirm.PermanentMany: "Мына {0:N0} элементті біржола жойғыңыз келетініне сенімдісіз бе?"
 Delete.Confirm.PermanentOne: "'{0}' элементін біржола жойғыңыз келетініне сенімдісіз бе?"

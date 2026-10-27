@@ -34,19 +34,20 @@ public class LocationProviderTests
         Assert.Equal(LocationCapabilities.None, _fs.CapabilitiesOf(null));
 
     [Fact]
-    public async Task StorageListsTheDrivesAndTheRecycleBin()
+    public async Task StorageListsTheDesktopTheDrivesAndTheRecycleBin()
     {
         var storage = await _fs.StorageAsync();
         var drives = await _fs.DrivesAsync();
+        var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
-        Assert.Equal([.. drives.Select(d => d.Path), "Recycle Bin"], storage.Select(e => e.Path));
+        Assert.Equal([desktop, .. drives.Select(d => d.Path), "Recycle Bin"], storage.Select(e => e.Path));
     }
 
     [Fact]
-    public async Task StorageOrdersDrivesByLetterAndEndsWithTheRecycleBin()
+    public async Task StorageOrdersDrivesByLetterBetweenTheDesktopAndTheRecycleBin()
     {
         var paths = (await _fs.StorageAsync()).Select(e => e.Path).ToList();
-        var drives = paths[..^1];
+        var drives = paths[1..^1];
 
         Assert.Equal("Recycle Bin", paths[^1]);
         Assert.Equal(drives.Order(StringComparer.OrdinalIgnoreCase), drives);

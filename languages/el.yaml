@@ -28,6 +28,7 @@ Console.StartFailed: "Δεν ήταν δυνατή η εκκίνηση του Po
 Default.CopyName: "{0} - Αντίγραφο"
 Default.NewFile: "Νέο έγγραφο κειμένου"
 Default.NewFolder: "Νέος φάκελος"
+Desktop.Name: "Επιφάνεια εργασίας"
 Default.ShortcutName: "{0} - Συντόμευση"
 Delete.Confirm.PermanentMany: "Είστε βέβαιοι ότι θέλετε να διαγράψετε οριστικά αυτά τα {0:N0} στοιχεία;"
 Delete.Confirm.PermanentOne: "Είστε βέβαιοι ότι θέλετε να διαγράψετε οριστικά το «{0}»;"
