@@ -8,6 +8,7 @@ public sealed class FolderWatcher : IDisposable
 {
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(400) };
     private FileSystemWatcher? _watcher;
+    private bool _disposed;
 
     public FolderWatcher() =>
         _timer.Tick += (_, _) =>
@@ -24,7 +25,7 @@ public sealed class FolderWatcher : IDisposable
     {
         _watcher?.Dispose();
         _watcher = null;
-        if (path is null)
+        if (path is null || _disposed)
             return;
 
         try
@@ -50,12 +51,18 @@ public sealed class FolderWatcher : IDisposable
     public void Restart()
     {
         _timer.Stop();
+        if (_disposed)
+            return;
+
         _timer.Start();
     }
 
+    // A closed tab can still finish an in-flight navigation, which must not re-open a handle on the folder.
     public void Dispose()
     {
+        _disposed = true;
         _timer.Stop();
         _watcher?.Dispose();
+        _watcher = null;
     }
 }
