@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using Xplore.App.ViewModels;
 using Xplore.Core.Locations;
 using Xplore.Core.Operations;
+using Xplore.Core.Phone;
 using Xplore.Core.Settings;
 
 namespace Xplore.App.Interaction;
@@ -134,7 +135,7 @@ public sealed class DragDropController(MainWindow window)
     }
 
     private static bool CanDrop(string[] sources, string? destDir) =>
-        destDir is not null && sources.Length > 0 && !sources.Any(s => FileOperations.IsSameOrInside(destDir, s) && Directory.Exists(s));
+        destDir is not null && sources.Length > 0 && !sources.Any(s => FileOperations.IsSameOrInside(destDir, s) && FileOperations.IsDirectory(s));
 
     private static bool CanMove(string[] sources, string destDir) =>
         CanDrop(sources, destDir) && !sources.All(s => FileOperations.SameParent(s, destDir));
@@ -174,7 +175,7 @@ public sealed class DragDropController(MainWindow window)
         {
             Choice(Loc.Get("Drop.Move"), () => tab.Files.DropAsync(sources, dest, true), CanMove(sources, dest)),
             Choice(Loc.Get("Drop.Copy"), () => tab.Files.DropAsync(sources, dest, false), true),
-            Choice(Loc.Get("Drop.Shortcut"), () => tab.Files.DropShortcutsAsync(sources, dest), true),
+            Choice(Loc.Get("Drop.Shortcut"), () => tab.Files.DropShortcutsAsync(sources, dest), !PhonePath.Is(dest) && !sources.Any(PhonePath.Is)),
             new Separator(),
             new MenuItem { Header = Loc.Get("Common.Cancel") },
         };

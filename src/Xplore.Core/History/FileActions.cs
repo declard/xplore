@@ -76,7 +76,7 @@ internal static class Text
 // Move: Pairs: each source path and where it ended up.
 public sealed class MoveAction(IReadOnlyList<(string From, string To)> pairs) : IHistoryAction
 {
-    private readonly string _noun = Text.Noun(pairs.Select(p => Directory.Exists(p.To)).ToList());
+    private readonly string _noun = Text.Noun(pairs.Select(p => FileOperations.IsDirectory(p.To)).ToList());
 
     public string Name => Text.Label(Loc.Get("Verb.Moved"), pairs.Select(p => p.To).ToList(), _noun);
     public bool Undoable => true;
@@ -100,7 +100,7 @@ public sealed class MoveAction(IReadOnlyList<(string From, string To)> pairs) : 
 // Copy: Pairs: each source path and the path of its copy.
 public sealed class CopyAction(IReadOnlyList<(string From, string To)> pairs) : IHistoryAction
 {
-    private readonly string _noun = Text.Noun(pairs.Select(p => Directory.Exists(p.To)).ToList());
+    private readonly string _noun = Text.Noun(pairs.Select(p => FileOperations.IsDirectory(p.To)).ToList());
 
     public string Name => Text.Label(Loc.Get("Verb.Copied"), pairs.Select(p => p.To).ToList(), _noun);
     public bool Undoable => true;
@@ -155,13 +155,7 @@ public sealed class CreateAction(string path, bool isFolder) : IHistoryAction
         Task.Run(() =>
         {
             Text.Require(!FileOperations.Exists(path), Loc.Format("Error.AlreadyExists", Text.Name(path)));
-            if (isFolder)
-            {
-                Directory.CreateDirectory(path);
-                return;
-            }
-
-            File.Create(path).Dispose();
+            FileOperations.Create(path, isFolder);
         });
 
     public string Describe(bool extended, PathFormat format) =>

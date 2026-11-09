@@ -8,6 +8,7 @@ A tabbed file explorer for Windows, written in C# with WPF. It looks and behaves
 - **Details view** with sorting, type-ahead selection, drag and drop, cut/copy/paste and the usual shell context menu actions, including "Open with" and "Send to"
 - **Search** in the current folder with glob patterns
 - **Recycle Bin** browsing, restoring and emptying
+- **Phones and cameras** connected by USB (MTP): browse, open, copy, move, rename and delete files like on a disk
 - **Undo/redo** (Ctrl+Z / Ctrl+Y) over a tree-shaped action history that keeps every branch
 - **Console**: a PowerShell session in the current folder, with the selected paths available as `$selection`
 - **Folder sync wizard**: scan, diff, plan and run a one-way synchronization, with dry run, hash verification, quarantine and resumable runs; diffs and plans can be exported and imported

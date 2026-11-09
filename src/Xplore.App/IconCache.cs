@@ -3,6 +3,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xplore.Core.Model;
+using Xplore.Core.Phone;
 using Xplore.Core.Settings;
 using Xplore.Core.Shell;
 
@@ -20,6 +21,7 @@ public static class IconCache
     public static ImageSource? For(FsEntry e) => e switch
     {
         { Path: RecycleBin.Location } => Cached("recycle-bin", () => ToImage(ShellInfo.IconAt(@"%SystemRoot%\System32\imageres.dll,-54"))),
+        { Path: var phone } when PhonePath.Is(phone) => ForPhone(e),
         { IsDirectory: true, Modified: null } => Load(e.Path, e.Path, true, true),
         { IsDirectory: true } => Folder,
         _ => PerFileExtensions.Contains(Path.GetExtension(e.Name))
@@ -28,6 +30,21 @@ public static class IconCache
     };
 
     public static ImageSource? Folder => Load("dir", "folder", true, false);
+
+    // Nothing on a phone is a real path, so its icons come from the type alone.
+    private static ImageSource? ForPhone(FsEntry e) => e switch
+    {
+        _ when PhonePath.IsDevice(e.Path) => Cached("phone", LoadPhone),
+        { IsDirectory: true } => Folder,
+        _ => Load("ext:" + Path.GetExtension(e.Name), "x" + Path.GetExtension(e.Name), false, false),
+    };
+
+    private static ImageSource LoadPhone()
+    {
+        var image = new BitmapImage(new Uri("pack://application:,,,/phone.png"));
+        image.Freeze();
+        return image;
+    }
 
     public static ImageSource? ForApp(OpenWithApp app) =>
         Cached("app:" + app.Path, () => FromLocation(app.Icon) ?? (File.Exists(app.Path) ? Load(app.Path, app.Path, false, true) : null));

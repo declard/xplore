@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Media;
 using Xplore.Core.Locations;
 using Xplore.Core.Model;
+using Xplore.Core.Phone;
 
 namespace Xplore.App.ViewModels;
 
@@ -153,7 +154,7 @@ public sealed class TreeNodeViewModel : ObservableObject
                 .Select(e => (
                     Entry: e,
                     Icon: IconCache.For(e),
-                    HasChildren: fs.CapabilitiesOf(e.Path).HasFlag(LocationCapabilities.Subfolders) && HasSubfolders(e.Path),
+                    HasChildren: fs.CapabilitiesOf(e.Path).HasFlag(LocationCapabilities.Subfolders) && (PhonePath.Is(e.Path) || HasSubfolders(e.Path)),
                     Usage: isRoot ? Usage(e.Path) : null))
                 .ToList());
 

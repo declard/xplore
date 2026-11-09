@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Xplore.App.ViewModels;
+using Xplore.Core.Phone;
 
 namespace Xplore.App.Interaction;
 
@@ -64,7 +65,7 @@ public sealed class TreeInteractions
         _renameCandidate = null;
         var src = e.OriginalSource as DependencyObject;
         var node = VisualTree.FindAncestor<TreeViewItem>(src)?.DataContext as TreeNodeViewModel;
-        _dragStart = node is { Path: { } p } && Path.GetPathRoot(p) != p && VisualTree.FindAncestor<TextBox>(src) is null ? e.GetPosition(null) : null;
+        _dragStart = node is { Path: { } p } && Path.GetPathRoot(p) != p && !PhonePath.IsDevice(p) && VisualTree.FindAncestor<TextBox>(src) is null ? e.GetPosition(null) : null;
         if (e.ChangedButton != MouseButton.Left || e.ClickCount != 1 || src is not TextBlock)
             return;
 

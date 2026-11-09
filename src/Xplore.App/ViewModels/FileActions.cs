@@ -4,6 +4,7 @@ using Xplore.Core.History;
 using Xplore.Core.Locations;
 using Xplore.Core.Model;
 using Xplore.Core.Operations;
+using Xplore.Core.Phone;
 using Xplore.Core.Settings;
 using Xplore.Core.Shell;
 
@@ -47,7 +48,7 @@ public sealed class FileActions
         PasteShortcutCommand = new AsyncRelayCommand(PasteShortcut, () => _folder.CurrentPath is not null && ClipboardHelper.HasFiles);
         CreateShortcutCommand = new AsyncRelayCommand(
             () => _runner.RunAsync(async () => await _folder.RefreshAsync(await MakeShortcuts(SelectedPaths, _folder.CurrentPath!))),
-            () => _folder.CurrentPath is not null && HasSelection);
+            () => _folder.CurrentPath is not null && HasSelection && !OnPhone);
         DeleteCommand = new AsyncRelayCommand(() => Delete(permanent: false), () => HasSelection);
         PermanentDeleteCommand = new AsyncRelayCommand(() => Delete(permanent: true), () => HasSelection);
         RenameCommand = new RelayCommand(() => BeginRename(_folder.Selection[0]), () => _folder.Selection is [_] && _folder.ItemsEditable);
@@ -55,7 +56,7 @@ public sealed class FileActions
         NewFileCommand = new AsyncRelayCommand(() => NewItem(isFolder: false), () => _folder.CurrentPath is not null);
         PropertiesCommand = new AsyncRelayCommand(
             () => _runner.Run(() => ShellVerbs.Properties(HasSelection ? SelectedPaths : [_folder.CurrentPath!])),
-            () => HasSelection || _folder.CurrentPath is not null);
+            () => (HasSelection || _folder.CurrentPath is not null) && !OnPhone);
     }
 
     public event Action<ItemViewModel>? RenameStarted;
@@ -75,6 +76,9 @@ public sealed class FileActions
     public ICommand PropertiesCommand { get; }
 
     private bool HasSelection => _folder.Selection is not [];
+
+    // Shortcuts and the shell's own dialogs need a file-system path, which a phone does not have.
+    private bool OnPhone => PhonePath.Is(_folder.CurrentPath) || _folder.Selection.Any(i => PhonePath.Is(i.Entry.Path));
 
     private IReadOnlyList<string> SelectedPaths => [.. _folder.Selection.Select(i => i.Entry.Path)];
 
@@ -168,6 +172,7 @@ public sealed class FileActions
         }
 
         var items = _folder.Selection.ToList();
+        permanent |= items.Any(i => PhonePath.Is(i.Entry.Path));
         if (items.Count == 0 || !await _prompts.ConfirmDeleteAsync(items, permanent))
             return;
 

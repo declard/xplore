@@ -5,6 +5,7 @@ using Xplore.Core.Localization;
 using Xplore.Core.Locations;
 using Xplore.Core.Model;
 using Xplore.Core.Navigation;
+using Xplore.Core.Phone;
 using Xplore.Core.Settings;
 using Xplore.Core.Shell;
 using System.Collections.ObjectModel;
@@ -153,6 +154,7 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
     public bool SortAscending => _sortAscending;
     public ImageSource? FolderIcon => IconCache.Folder;
     public IReadOnlyList<string> SelectedPaths => _selection.Select(i => i.Entry.Path).ToList();
+    public bool SelectionOnPhone => _selection.Any(i => PhonePath.Is(i.Entry.Path));
     public IReadOnlyList<Crumb> BackList => _history.BackStack.Select(ToCrumb).ToList();
     public IReadOnlyList<Crumb> ForwardList => _history.ForwardStack.Select(ToCrumb).ToList();
 
@@ -217,6 +219,16 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
         var path = item.Entry.Path;
         if (item.Entry.IsDirectory && CurrentPath is { } here && !_fs.CapabilitiesOf(here).HasFlag(LocationCapabilities.Subfolders))
             return;
+
+        if (!item.Entry.IsDirectory && PhonePath.Is(path))
+        {
+            await _runner.RunAsync(async () =>
+            {
+                var local = await Task.Run(() => Phones.Extract(path));
+                Process.Start(new ProcessStartInfo(local) { UseShellExecute = true });
+            });
+            return;
+        }
 
         if ((item.Entry.IsDirectory ? path : await FolderShortcutTarget(path)) is { } folder)
         {

@@ -31,6 +31,7 @@ public static class CompositionRoot
             .AddSingleton<TimestampFormat>()
             .AddSingleton<IUserPrompts, WpfPrompts>()
             .AddSingleton<FileLocationProvider>()
+            .AddSingleton<ILocationProvider, PhoneLocationProvider>()
             .AddSingleton<ILocationProvider, RecycleBinLocationProvider>()
             .AddSingleton<IFileSystemService, FileSystemService>()
             .AddSingleton<OpenWithStore>()

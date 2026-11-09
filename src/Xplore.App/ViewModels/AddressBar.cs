@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using Xplore.Core.Localization;
 using Xplore.Core.Model;
+using Xplore.Core.Phone;
 using Xplore.Core.Settings;
 using Xplore.Core.Shell;
 
@@ -47,6 +48,9 @@ public sealed class AddressBar : ObservableObject
         if (path is null)
             return [storage];
 
+        if (PhonePath.Is(path))
+            return [storage, .. PhoneCrumbs(path)];
+
         if (_fs.Canonical(path) is { } virtualLocation)
             return [storage, new(RecycleBin.DisplayName, virtualLocation)];
 
@@ -55,6 +59,15 @@ public sealed class AddressBar : ObservableObject
         var segments = path[root.Length..].Split('\\', StringSplitOptions.RemoveEmptyEntries);
         var rest = segments.Select((s, i) => new Crumb(s, Path.Combine(root, string.Join('\\', segments.Take(i + 1)))));
         return [storage, new Crumb(rootName, root), .. rest];
+    }
+
+    private static IEnumerable<Crumb> PhoneCrumbs(string path)
+    {
+        var (device, inside) = PhonePath.Split(path);
+        var segments = inside.Split('\\', StringSplitOptions.RemoveEmptyEntries);
+        return segments
+            .Select((s, i) => new Crumb(s, PhonePath.Combine(device, "\\" + string.Join('\\', segments.Take(i + 1)))))
+            .Prepend(new Crumb(device, PhonePath.Combine(device)));
     }
 
     private static async Task<string?> TryResolve(string trimmed)

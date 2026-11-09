@@ -1,4 +1,5 @@
 using Xplore.Core.Localization;
+using Xplore.Core.Phone;
 using Xplore.Core.Shell;
 using Microsoft.VisualBasic.FileIO;
 
@@ -16,7 +17,7 @@ public static class FileOperations
     public static string CreateFolder(string dir)
     {
         var path = UniquePath(dir, Loc.Get("Default.NewFolder"));
-        Directory.CreateDirectory(path);
+        Create(path, isFolder: true);
         return path;
     }
 
@@ -26,7 +27,7 @@ public static class FileOperations
             throw new ArgumentException(error);
 
         var path = Path.Combine(dir, name);
-        Directory.CreateDirectory(path);
+        Create(path, isFolder: true);
         return path;
     }
 
@@ -44,15 +45,38 @@ public static class FileOperations
             throw new ArgumentException(error);
 
         var path = Path.Combine(dir, name);
-        File.Create(path).Dispose();
+        Create(path, isFolder: false);
         return path;
     }
 
     public static string CreateFile(string dir)
     {
         var path = UniquePath(dir, Loc.Get("Default.NewFile"), ".txt");
-        File.Create(path).Dispose();
+        Create(path, isFolder: false);
         return path;
+    }
+
+    public static void Create(string path, bool isFolder)
+    {
+        if (PhonePath.Is(path))
+        {
+            if (isFolder)
+            {
+                Phones.CreateFolder(path);
+                return;
+            }
+
+            Phones.CreateFile(path);
+            return;
+        }
+
+        if (isFolder)
+        {
+            Directory.CreateDirectory(path);
+            return;
+        }
+
+        File.Create(path).Dispose();
     }
 
     public static string Rename(string path, string newName)
@@ -68,6 +92,12 @@ public static class FileOperations
         var caseOnly = string.Equals(dest, path, StringComparison.OrdinalIgnoreCase);
         if (!caseOnly && Exists(dest))
             throw new IOException(Loc.Format("Error.NameExists", newName));
+
+        if (PhonePath.Is(path))
+        {
+            Phones.Rename(path, newName);
+            return dest;
+        }
 
         var isDir = Directory.Exists(path);
         void MoveItem(string from, string to)
@@ -98,6 +128,12 @@ public static class FileOperations
         var option = permanent ? RecycleOption.DeletePermanently : RecycleOption.SendToRecycleBin;
         paths.ToList().ForEach(p =>
         {
+            if (PhonePath.Is(p))
+            {
+                Phones.Delete(p);
+                return;
+            }
+
             if (Directory.Exists(p))
             {
                 FileSystem.DeleteDirectory(p, UIOption.OnlyErrorDialogs, option);
@@ -111,6 +147,9 @@ public static class FileOperations
     public static IReadOnlyList<string> CreateShortcuts(IEnumerable<string> targets, string destDir) =>
         targets.ToList().Select(target =>
         {
+            if (PhonePath.Is(target) || PhonePath.Is(destDir))
+                throw new IOException(Loc.Get("Error.PhoneShortcut"));
+
             var lnk = UniquePath(destDir, Loc.Format("Default.ShortcutName", Path.GetFileName(target.TrimEnd('\\'))), ".lnk");
             Shortcuts.Create(lnk, target);
             return lnk;
@@ -160,13 +199,15 @@ public static class FileOperations
     public static bool SameParent(string path, string dir) =>
         string.Equals(Normalize(Path.GetDirectoryName(path.TrimEnd('\\')) ?? ""), Normalize(dir), StringComparison.OrdinalIgnoreCase);
 
-    public static bool Exists(string path) => File.Exists(path) || Directory.Exists(path);
+    public static bool Exists(string path) => PhonePath.Is(path) ? Phones.Exists(path) : File.Exists(path) || Directory.Exists(path);
+
+    public static bool IsDirectory(string path) => PhonePath.Is(path) ? Phones.IsDirectory(path) : Directory.Exists(path);
 
     private static bool IsInvalidName(string name) => name.Length == 0 || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0;
 
     private static string TransferOne(string src, string destDir, bool move)
     {
-        var isDir = Directory.Exists(src);
+        var isDir = IsDirectory(src);
         if (isDir && IsSameOrInside(destDir, src))
             throw new IOException(Loc.Get("Error.DestInSource"));
 
@@ -190,6 +231,12 @@ public static class FileOperations
 
     private static void TransferExact(string from, string to, bool move, UIOption ui)
     {
+        if (PhonePath.Is(from) || PhonePath.Is(to))
+        {
+            Phones.Transfer(from, to, move);
+            return;
+        }
+
         Action transfer = (Directory.Exists(from), move) switch
         {
             (true, true) => () => FileSystem.MoveDirectory(from, to, ui),
