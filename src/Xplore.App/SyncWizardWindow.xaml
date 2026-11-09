@@ -20,10 +20,10 @@
         </Style>
         <Style TargetType="TextBox">
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Height" Value="24"/>
+            <Setter Property="Height" Value="26"/>
         </Style>
         <Style TargetType="ComboBox">
-            <Setter Property="Height" Value="24"/>
+            <Setter Property="Height" Value="26"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="SelectedValuePath" Value="Value"/>
             <Setter Property="DisplayMemberPath" Value="Label"/>
@@ -138,12 +138,10 @@
 
                     <TextBlock Grid.Row="1" Text="{l:Loc Sync.RightFolder}" VerticalAlignment="Center" Margin="0,0,12,0"/>
                     <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Right, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0"/>
-                    <Button Grid.Row="1" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="Right" Click="BrowseRoot_Click"/>
+                    <Button Grid.Row="1" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="Right" Click="BrowseRoot_Click" Margin="0"/>
 
-                    <DockPanel Grid.Row="2" Grid.ColumnSpan="3">
-                        <Button DockPanel.Dock="Right" Content="{l:Loc Sync.ImportGlobs}" Margin="0" Click="ImportGlobs_Click"/>
-                        <TextBlock Style="{StaticResource Caption}" Text="{l:Loc Sync.Patterns.Hint}"/>
-                    </DockPanel>
+                    <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource Caption}" VerticalAlignment="Bottom" Text="{l:Loc Sync.Patterns.Hint}"/>
+                    <Button Grid.Row="2" Grid.Column="2" Content="{l:Loc Sync.ImportGlobs}" Margin="0,10,0,4" Click="ImportGlobs_Click"/>
                     <TextBox Grid.Row="3" Grid.ColumnSpan="3" Height="Auto" Text="{Binding GlobsText, UpdateSourceTrigger=PropertyChanged}"
                              AcceptsReturn="True" VerticalContentAlignment="Top" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" Padding="4"/>
 
@@ -208,40 +206,34 @@
             <!-- 3. Plan -->
             <TabItem Header="{l:Loc Sync.Tab.Plan}">
                 <DockPanel Margin="14">
-                    <Grid DockPanel.Dock="Top">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                            <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.Direction}"/>
-                            <ComboBox Width="150" SelectedIndex="{Binding Direction}">
-                                <ComboBoxItem Content="{l:Loc Sync.Direction.LeftToRight}"/>
-                                <ComboBoxItem Content="{l:Loc Sync.Direction.RightToLeft}"/>
-                            </ComboBox>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Margin="0,0,16,0">
-                            <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.SourcePolicy}"/>
-                            <ComboBox Width="130" ItemsSource="{Binding SourcePolicies}" SelectedValue="{Binding SourcePolicy}"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2" Margin="0,0,16,0">
-                            <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.MatchedPolicy}"/>
-                            <ComboBox Width="140" ItemsSource="{Binding MatchedPolicies}" SelectedValue="{Binding MatchedPolicy}"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="3" Margin="0,0,16,0">
-                            <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.UnmatchedPolicy}"/>
-                            <ComboBox Width="130" ItemsSource="{Binding UnmatchedPolicies}" SelectedValue="{Binding UnmatchedPolicy}"/>
-                        </StackPanel>
-                        <Button Grid.Column="4" Content="{l:Loc Sync.BuildPlan}" VerticalAlignment="Bottom" FontWeight="SemiBold" IsEnabled="{Binding CanBuildPlan}" Click="BuildPlan_Click"/>
-                        <StackPanel Grid.Column="5" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <DockPanel DockPanel.Dock="Top">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="8,0,0,6">
                             <Button Content="{l:Loc Common.Import}" Click="ImportPlan_Click"/>
                             <Button Content="{l:Loc Common.Export}" Margin="0" IsEnabled="{Binding CanRun}" Click="ExportPlan_Click"/>
                         </StackPanel>
-                    </Grid>
+                        <WrapPanel>
+                            <StackPanel Margin="0,0,16,6">
+                                <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.Direction}"/>
+                                <ComboBox Width="150" DisplayMemberPath="" SelectedValuePath="" SelectedIndex="{Binding Direction}">
+                                    <ComboBoxItem Content="{l:Loc Sync.Direction.LeftToRight}"/>
+                                    <ComboBoxItem Content="{l:Loc Sync.Direction.RightToLeft}"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,6">
+                                <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.SourcePolicy}"/>
+                                <ComboBox Width="130" ItemsSource="{Binding SourcePolicies}" SelectedValue="{Binding SourcePolicy}"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,6">
+                                <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.MatchedPolicy}"/>
+                                <ComboBox Width="140" ItemsSource="{Binding MatchedPolicies}" SelectedValue="{Binding MatchedPolicy}"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,6">
+                                <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,4" Text="{l:Loc Sync.UnmatchedPolicy}"/>
+                                <ComboBox Width="130" ItemsSource="{Binding UnmatchedPolicies}" SelectedValue="{Binding UnmatchedPolicy}"/>
+                            </StackPanel>
+                            <Button Content="{l:Loc Sync.BuildPlan}" VerticalAlignment="Bottom" Margin="0,0,16,6" FontWeight="SemiBold" IsEnabled="{Binding CanBuildPlan}" Click="BuildPlan_Click"/>
+                        </WrapPanel>
+                    </DockPanel>
 
                     <Grid DockPanel.Dock="Top" Margin="0,10,0,8">
                         <Grid.ColumnDefinitions>
@@ -258,7 +250,7 @@
                         <Button Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="PlanSource" Click="BrowseRoot_Click" Margin="0,0,0,6"/>
                         <TextBlock Grid.Row="1" Text="{l:Loc Sync.TargetFolder}" VerticalAlignment="Center" Margin="0,0,12,0"/>
                         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding PlanTarget, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0"/>
-                        <Button Grid.Row="1" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="PlanTarget" Click="BrowseRoot_Click"/>
+                        <Button Grid.Row="1" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="PlanTarget" Click="BrowseRoot_Click" Margin="0"/>
                     </Grid>
 
                     <TextBlock DockPanel.Dock="Bottom" Text="{Binding PlanSummary}" Foreground="#4C4C4C" Margin="0,6,0,0" TextWrapping="Wrap"/>
@@ -298,7 +290,7 @@
                         <TextBlock Grid.Row="2" Text="{l:Loc Sync.ResumeLog}" VerticalAlignment="Center" Margin="0,0,12,0"/>
                         <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,8,0" Text="{Binding ResumeLog, UpdateSourceTrigger=PropertyChanged}"
                                  ToolTip="{l:Loc Sync.ResumeLog.ToolTip}"/>
-                        <Button Grid.Row="2" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="ResumeLog" Click="BrowseRoot_Click"/>
+                        <Button Grid.Row="2" Grid.Column="2" Content="{l:Loc Common.Browse}" Tag="ResumeLog" Click="BrowseRoot_Click" Margin="0"/>
                     </Grid>
 
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,12,0,10">
@@ -336,7 +328,7 @@
                 <Button Content="{l:Loc Sync.CancelOperation}" Click="CancelOperation_Click" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}"/>
                 <Button Content="{l:Loc Sync.Back}" Click="Back_Click"/>
                 <Button Content="{l:Loc Sync.Next}" Click="Next_Click"/>
-                <Button Content="{l:Loc Common.Close}" Margin="0" IsCancel="True"/>
+                <Button Content="{l:Loc Common.Close}" Margin="0" IsCancel="True" Click="Close_Click"/>
             </StackPanel>
             <TextBlock Text="{Binding Status}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}" Margin="0,0,12,0">
                 <TextBlock.Style>

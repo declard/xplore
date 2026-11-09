@@ -25,6 +25,8 @@ public partial class SyncWizardWindow : Window
 
     private void Next_Click(object sender, RoutedEventArgs e) => _vm.Step = Math.Min(3, _vm.Step + 1);
 
+    private void Close_Click(object sender, RoutedEventArgs e) => Close();
+
     private void CancelOperation_Click(object sender, RoutedEventArgs e) => _vm.Cancel();
 
     private void Scan_Click(object sender, RoutedEventArgs e) => _vm.ScanAsync().Forget();
