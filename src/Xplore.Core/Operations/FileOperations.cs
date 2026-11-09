@@ -1,7 +1,6 @@
 using Xplore.Core.Localization;
-using Xplore.Core.Phone;
 using Xplore.Core.Shell;
-using Microsoft.VisualBasic.FileIO;
+using Xplore.Core.Storage;
 
 namespace Xplore.Core.Operations;
 
@@ -58,25 +57,13 @@ public static class FileOperations
 
     public static void Create(string path, bool isFolder)
     {
-        if (PhonePath.Is(path))
-        {
-            if (isFolder)
-            {
-                Phones.CreateFolder(path);
-                return;
-            }
-
-            Phones.CreateFile(path);
-            return;
-        }
-
         if (isFolder)
         {
-            Directory.CreateDirectory(path);
+            Stores.CreateDirectory(path);
             return;
         }
 
-        File.Create(path).Dispose();
+        Stores.CreateFile(path);
     }
 
     public static string Rename(string path, string newName)
@@ -84,8 +71,7 @@ public static class FileOperations
         if (IsInvalidName(newName))
             throw new ArgumentException(InvalidNameMessage);
 
-        var dir = Path.GetDirectoryName(path)!;
-        var dest = Path.Combine(dir, newName);
+        var dest = Path.Combine(Stores.Parent(path)!, newName);
         if (dest == path)
             return path;
 
@@ -93,61 +79,16 @@ public static class FileOperations
         if (!caseOnly && Exists(dest))
             throw new IOException(Loc.Format("Error.NameExists", newName));
 
-        if (PhonePath.Is(path))
-        {
-            Phones.Rename(path, newName);
-            return dest;
-        }
-
-        var isDir = Directory.Exists(path);
-        void MoveItem(string from, string to)
-        {
-            if (isDir)
-            {
-                Directory.Move(from, to);
-                return;
-            }
-
-            File.Move(from, to);
-        }
-
-        if (!caseOnly)
-        {
-            MoveItem(path, dest);
-            return dest;
-        }
-
-        var temp = UniquePath(dir, Guid.NewGuid().ToString("N"));
-        MoveItem(path, temp);
-        MoveItem(temp, dest);
-        return dest;
+        return Stores.Rename(path, newName);
     }
 
-    public static void Delete(IEnumerable<string> paths, bool permanent = false)
-    {
-        var option = permanent ? RecycleOption.DeletePermanently : RecycleOption.SendToRecycleBin;
-        paths.ToList().ForEach(p =>
-        {
-            if (PhonePath.Is(p))
-            {
-                Phones.Delete(p);
-                return;
-            }
-
-            if (Directory.Exists(p))
-            {
-                FileSystem.DeleteDirectory(p, UIOption.OnlyErrorDialogs, option);
-                return;
-            }
-
-            FileSystem.DeleteFile(p, UIOption.OnlyErrorDialogs, option);
-        });
-    }
+    public static void Delete(IEnumerable<string> paths, bool permanent = false) =>
+        paths.ToList().ForEach(p => Stores.Delete(p, recycle: !permanent));
 
     public static IReadOnlyList<string> CreateShortcuts(IEnumerable<string> targets, string destDir) =>
         targets.ToList().Select(target =>
         {
-            if (PhonePath.Is(target) || PhonePath.Is(destDir))
+            if (!Stores.Has(target, StoreCapabilities.RealPath) || !Stores.Has(destDir, StoreCapabilities.RealPath))
                 throw new IOException(Loc.Get("Error.PhoneShortcut"));
 
             var lnk = UniquePath(destDir, Loc.Format("Default.ShortcutName", Path.GetFileName(target.TrimEnd('\\'))), ".lnk");
@@ -161,9 +102,9 @@ public static class FileOperations
     public static IReadOnlyList<(string From, string To)> TransferPairs(IEnumerable<string> sources, string destDir, bool move) =>
         sources.ToList().Select(s => (From: s, To: TransferOne(s, destDir, move))).ToList();
 
-    public static void Move(string from, string to) => TransferExact(from, to, move: true, UIOption.OnlyErrorDialogs);
+    public static void Move(string from, string to) => Stores.Transfer(from, to, move: true, showDialogs: false);
 
-    public static void Copy(string from, string to) => TransferExact(from, to, move: false, UIOption.OnlyErrorDialogs);
+    public static void Copy(string from, string to) => Stores.Transfer(from, to, move: false, showDialogs: false);
 
     public static Task<string> CreateFolderAsync(string dir) => Task.Run(() => CreateFolder(dir));
 
@@ -199,9 +140,9 @@ public static class FileOperations
     public static bool SameParent(string path, string dir) =>
         string.Equals(Normalize(Path.GetDirectoryName(path.TrimEnd('\\')) ?? ""), Normalize(dir), StringComparison.OrdinalIgnoreCase);
 
-    public static bool Exists(string path) => PhonePath.Is(path) ? Phones.Exists(path) : File.Exists(path) || Directory.Exists(path);
+    public static bool Exists(string path) => Stores.Exists(path);
 
-    public static bool IsDirectory(string path) => PhonePath.Is(path) ? Phones.IsDirectory(path) : Directory.Exists(path);
+    public static bool IsDirectory(string path) => Stores.IsDirectory(path);
 
     private static bool IsInvalidName(string name) => name.Length == 0 || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0;
 
@@ -216,7 +157,7 @@ public static class FileOperations
             return src;
 
         var dest = sameFolder ? CopyPath(src, destDir, isDir) : Path.Combine(destDir, Path.GetFileName(src.TrimEnd('\\')));
-        TransferExact(src, dest, move, UIOption.AllDialogs);
+        Stores.Transfer(src, dest, move, showDialogs: true);
         return dest;
     }
 
@@ -227,24 +168,6 @@ public static class FileOperations
             return UniquePath(destDir, Loc.Format("Default.CopyName", name));
 
         return UniquePath(destDir, Loc.Format("Default.CopyName", Path.GetFileNameWithoutExtension(name)), Path.GetExtension(name));
-    }
-
-    private static void TransferExact(string from, string to, bool move, UIOption ui)
-    {
-        if (PhonePath.Is(from) || PhonePath.Is(to))
-        {
-            Phones.Transfer(from, to, move);
-            return;
-        }
-
-        Action transfer = (Directory.Exists(from), move) switch
-        {
-            (true, true) => () => FileSystem.MoveDirectory(from, to, ui),
-            (true, false) => () => FileSystem.CopyDirectory(from, to, ui),
-            (false, true) => () => FileSystem.MoveFile(from, to, ui),
-            (false, false) => () => FileSystem.CopyFile(from, to, ui),
-        };
-        transfer();
     }
 
     private static string Normalize(string p) => p.TrimEnd('\\') + "\\";

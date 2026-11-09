@@ -26,6 +26,18 @@ public sealed class FileLocationProvider : ILocationProvider
         }
     }
 
+    public async Task<IReadOnlyList<Breadcrumb>> BreadcrumbsAsync(string location, CancellationToken ct = default)
+    {
+        var root = Path.GetPathRoot(location)!;
+        var rootName = (await DrivesAsync(ct)).FirstOrDefault(d => string.Equals(d.Path, root, StringComparison.OrdinalIgnoreCase))?.Name ?? root;
+        var segments = location[root.Length..].Split('\\', StringSplitOptions.RemoveEmptyEntries);
+        return
+        [
+            new(rootName, root),
+            .. segments.Select((s, i) => new Breadcrumb(s, Path.Combine(root, string.Join('\\', segments.Take(i + 1))))),
+        ];
+    }
+
     public async Task<IReadOnlyList<FsEntry>> StorageEntriesAsync(CancellationToken ct = default) =>
         [Desktop(), .. await DrivesAsync(ct)];
 

@@ -1,5 +1,6 @@
 using Xplore.Core.Localization;
 using Xplore.Core.Operations;
+using Xplore.Core.Storage;
 
 namespace Xplore.Sync;
 
@@ -53,6 +54,9 @@ public static class PlanExecutor
         if (options is { Quarantine: QuarantineMode.Folder, QuarantineFolder: null or "" })
             throw new ArgumentException(Loc.Get("Sync.Error.QuarantineRequired"));
 
+        if (options.Quarantine == QuarantineMode.Recycle && new[] { plan.Source, plan.Target }.Any(r => !Stores.Has(r, StoreCapabilities.RecycleBin)))
+            throw new ArgumentException(Loc.Get("Sync.Error.RecycleUnavailable"));
+
         if (plan.Steps.FirstOrDefault(s => Path.IsPathRooted(s.Path) || s.Path.Split('\\', '/').Contains("..")) is { } bad)
             throw new FormatException(Loc.Format("Sync.Error.PathOutside", bad.Path));
     }
@@ -79,7 +83,7 @@ public static class PlanExecutor
                 case PlanCommand.Mkdir:
                     if (!dry)
                     {
-                        Directory.CreateDirectory(tgt);
+                        Stores.CreateDirectory(tgt);
                     }
 
                     break;
@@ -100,7 +104,7 @@ public static class PlanExecutor
                     RequireExists(src);
                     if (!dry)
                     {
-                        var overwrite = Options.Quarantine == QuarantineMode.None && File.Exists(tgt);
+                        var overwrite = Options.Quarantine == QuarantineMode.None && Stores.Info(tgt) is { IsDirectory: false };
                         if (!overwrite && FileOperations.Exists(tgt))
                         {
                             Discard(tgt, Side.Target, step.Path);
@@ -137,56 +141,29 @@ public static class PlanExecutor
 
         private void Transfer(string src, string dst, bool move, bool overwrite)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(dst)!);
-            if (File.Exists(src))
-            {
-                var expected = Options.VerifyAfterCopy ? FileHash.Of(src) : null;
-                if (move)
-                {
-                    File.Move(src, dst, overwrite);
-                }
-                else
-                {
-                    File.Copy(src, dst, overwrite);
-                }
-
-                if (expected is not null && FileHash.Of(dst) != expected)
-                    throw new IOException(Loc.Format("Sync.Error.Verify", dst));
-
-                return;
-            }
-
-            if (move && string.Equals(Path.GetPathRoot(src), Path.GetPathRoot(dst), StringComparison.OrdinalIgnoreCase))
-            {
-                Directory.Move(src, dst);
-                return;
-            }
-
-            CopyFolder(new(src), new(dst));
+            var isFile = Stores.Info(src) is { IsDirectory: false };
+            var expected = Options.VerifyAfterCopy && isFile ? FileHash.Of(src) : null;
+            var check = isFile ? null : (Action<StoreEntry, string>)Verify;
             if (move)
             {
-                Directory.Delete(src, recursive: true);
+                Stores.Move(src, dst, overwrite, check);
             }
+            else
+            {
+                Stores.Copy(src, dst, overwrite, check);
+            }
+
+            if (expected is not null && FileHash.Of(dst) != expected)
+                throw new IOException(Loc.Format("Sync.Error.Verify", dst));
         }
 
-        private void CopyFolder(DirectoryInfo src, DirectoryInfo dst)
+        // A folder is verified file by file as it is copied; a single file against the hash taken before it moved.
+        private void Verify(StoreEntry source, string target)
         {
-            dst.Create();
-            foreach (var entry in src.EnumerateFileSystemInfos().Where(e => !e.Attributes.HasFlag(FileAttributes.ReparsePoint)))
-            {
-                var target = Path.Combine(dst.FullName, entry.Name);
-                if (entry is DirectoryInfo d)
-                {
-                    CopyFolder(d, new(target));
-                    continue;
-                }
+            if (!Options.VerifyAfterCopy || FileHash.Of(source.Path) == FileHash.Of(target))
+                return;
 
-                File.Copy(entry.FullName, target);
-                if (Options.VerifyAfterCopy && FileHash.Of(entry.FullName) != FileHash.Of(target))
-                    throw new IOException(Loc.Format("Sync.Error.Verify", target));
-            }
-
-            dst.LastWriteTimeUtc = src.LastWriteTimeUtc;
+            throw new IOException(Loc.Format("Sync.Error.Verify", target));
         }
 
         // Removes an item the way the quarantine mode says: permanently, to the Recycle Bin, or into the quarantine folder.
@@ -195,20 +172,14 @@ public static class PlanExecutor
             switch (Options.Quarantine)
             {
                 case QuarantineMode.Recycle:
-                    FileOperations.Delete([path]);
+                    Stores.Delete(path, recycle: true);
                     break;
                 case QuarantineMode.Folder:
                     var kept = Path.Combine(Options.QuarantineFolder!, RunId, side.ToString().ToLowerInvariant(), relative);
                     Transfer(path, kept, move: true, overwrite: true);
                     break;
                 default:
-                    if (Directory.Exists(path))
-                    {
-                        Directory.Delete(path, recursive: true);
-                        break;
-                    }
-
-                    File.Delete(path);
+                    Stores.Delete(path);
                     break;
             }
         }

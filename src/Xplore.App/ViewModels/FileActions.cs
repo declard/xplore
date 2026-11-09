@@ -4,7 +4,7 @@ using Xplore.Core.History;
 using Xplore.Core.Locations;
 using Xplore.Core.Model;
 using Xplore.Core.Operations;
-using Xplore.Core.Phone;
+using Xplore.Core.Storage;
 using Xplore.Core.Settings;
 using Xplore.Core.Shell;
 
@@ -78,7 +78,7 @@ public sealed class FileActions
     private bool HasSelection => _folder.Selection is not [];
 
     // Shortcuts and the shell's own dialogs need a file-system path, which a phone does not have.
-    private bool OnPhone => PhonePath.Is(_folder.CurrentPath) || _folder.Selection.Any(i => PhonePath.Is(i.Entry.Path));
+    private bool OnPhone => _folder.CurrentPath is { } here && !Stores.Has(here, StoreCapabilities.RealPath) || _folder.Selection.Any(i => !Stores.Has(i.Entry.Path, StoreCapabilities.RealPath));
 
     private IReadOnlyList<string> SelectedPaths => [.. _folder.Selection.Select(i => i.Entry.Path)];
 
@@ -172,7 +172,7 @@ public sealed class FileActions
         }
 
         var items = _folder.Selection.ToList();
-        permanent |= items.Any(i => PhonePath.Is(i.Entry.Path));
+        permanent |= items.Any(i => !Stores.Has(i.Entry.Path, StoreCapabilities.RecycleBin));
         if (items.Count == 0 || !await _prompts.ConfirmDeleteAsync(items, permanent))
             return;
 

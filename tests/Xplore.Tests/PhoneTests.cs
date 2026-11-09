@@ -5,6 +5,7 @@ using Xplore.Core.Model;
 using Xplore.Core.Navigation;
 using Xplore.Core.Operations;
 using Xplore.Core.Phone;
+using Xplore.Core.Storage;
 
 namespace Xplore.Tests;
 
@@ -256,7 +257,7 @@ public sealed class PhoneTests : IDisposable
     {
         _phone.Items[@"\Internal\a.txt"] = Encoding.UTF8.GetBytes("abc");
 
-        var local = Phones.Extract(Storage + @"\a.txt");
+        var local = Stores.ToLocalFile(Storage + @"\a.txt");
 
         Assert.Equal(("a.txt", "abc"), (Path.GetFileName(local), File.ReadAllText(local)));
     }

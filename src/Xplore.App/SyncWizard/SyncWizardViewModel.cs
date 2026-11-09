@@ -1,3 +1,4 @@
+using Xplore.Core.Storage;
 using Xplore.Core.Localization;
 using Xplore.Core.Settings;
 using Xplore.Sync;
@@ -219,7 +220,7 @@ public sealed class SyncWizardViewModel : ObservableObject
         UnmatchedPolicy = plan.Policy.Unmatched;
         SetPlan(plan);
         Step = 2;
-        var missing = new[] { plan.Source, plan.Target }.Where(r => !Directory.Exists(r)).ToList();
+        var missing = new[] { plan.Source, plan.Target }.Where(r => !Stores.IsDirectory(r)).ToList();
         if (missing.Count > 0)
         {
             Error(Loc.Format("Sync.Error.FoldersMissing", string.Join(", ", missing)));

@@ -4,6 +4,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xplore.Core.Model;
 using Xplore.Core.Phone;
+using Xplore.Core.Storage;
+using Xplore.Core.Storage;
 using Xplore.Core.Settings;
 using Xplore.Core.Shell;
 
@@ -21,7 +23,7 @@ public static class IconCache
     public static ImageSource? For(FsEntry e) => e switch
     {
         { Path: RecycleBin.Location } => Cached("recycle-bin", () => ToImage(ShellInfo.IconAt(@"%SystemRoot%\System32\imageres.dll,-54"))),
-        { Path: var phone } when PhonePath.Is(phone) => ForPhone(e),
+        { Path: var off } when !Stores.Has(off, StoreCapabilities.RealPath) => ForPhone(e),
         { IsDirectory: true, Modified: null } => Load(e.Path, e.Path, true, true),
         { IsDirectory: true } => Folder,
         _ => PerFileExtensions.Contains(Path.GetExtension(e.Name))

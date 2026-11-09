@@ -18,6 +18,9 @@ public enum LocationCapabilities
     All = Write | Bookmark | Console | Watch | Subfolders,
 }
 
+// One level of the address bar's breadcrumb trail: its name and the location it leads to.
+public sealed record Breadcrumb(string Name, string Path);
+
 // A source of entries for one kind of location. Entries carry the real path of the item they stand for, so file operations work on them directly.
 public interface ILocationProvider
 {
@@ -31,6 +34,9 @@ public interface ILocationProvider
     Task<IReadOnlyList<FsEntry>> ListAsync(string location, CancellationToken ct = default);
 
     IAsyncEnumerable<FsEntry> EnumerateAsync(string location, CancellationToken ct = default);
+
+    // The breadcrumb trail of a location, from the first level below Storage.
+    Task<IReadOnlyList<Breadcrumb>> BreadcrumbsAsync(string location, CancellationToken ct = default);
 
     // The entries this provider contributes to the root level "Storage".
     Task<IReadOnlyList<FsEntry>> StorageEntriesAsync(CancellationToken ct = default);

@@ -1,3 +1,5 @@
+using Xplore.Core.Storage;
+
 namespace Xplore.Core.Settings;
 
 // The open tabs at the last exit. Tabs: location of each tab in order ("Storage" for the drive list); Selected: index of the active tab.
@@ -23,7 +25,7 @@ public sealed record StartTabs(IReadOnlyList<string?> Locations, int Selected)
         _ => new([null], 0),
     };
 
-    private static string? Existing(string? path) => !string.IsNullOrWhiteSpace(path) && Directory.Exists(path) ? path : null;
+    private static string? Existing(string? path) => !string.IsNullOrWhiteSpace(path) && Stores.IsDirectory(path) ? path : null;
 }
 
 public sealed class SessionStore(string filePath)

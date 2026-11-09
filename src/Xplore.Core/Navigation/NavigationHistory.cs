@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using Xplore.Core.Phone;
+using Xplore.Core.Storage;
 
 namespace Xplore.Core.Navigation;
 
@@ -29,5 +29,5 @@ public sealed record NavigationHistory(
 
     public NavigationHistory ForwardBy(int steps) => Enumerable.Range(0, steps).Aggregate(this, (h, _) => h.Forward());
 
-    public NavigationHistory Up() => CanGoUp ? Navigate(PhonePath.Is(Current) ? PhonePath.Parent(Current!) : Path.GetDirectoryName(Current)) : this;
+    public NavigationHistory Up() => CanGoUp ? Navigate(Stores.Parent(Current!)) : this;
 }

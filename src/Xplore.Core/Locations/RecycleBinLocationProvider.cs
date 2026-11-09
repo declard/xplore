@@ -31,6 +31,9 @@ public sealed class RecycleBinLocationProvider : ILocationProvider
 
     private static bool IsName(string text, string name) => string.Equals(text, name, StringComparison.OrdinalIgnoreCase);
 
+    public Task<IReadOnlyList<Breadcrumb>> BreadcrumbsAsync(string location, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<Breadcrumb>>([new(RecycleBin.DisplayName, RecycleBin.Location)]);
+
     public Task<IReadOnlyList<FsEntry>> StorageEntriesAsync(CancellationToken ct = default) =>
         Task.FromResult<IReadOnlyList<FsEntry>>([_entry]);
 }

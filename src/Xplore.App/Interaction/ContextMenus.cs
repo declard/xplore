@@ -135,7 +135,7 @@ public sealed class ContextMenus(MainWindow window)
             item.Click += (_, _) => window.Dispatcher.BeginInvoke(() => tab.Files.SendToAsync(t).Forget(), DispatcherPriority.Background);
             sendTo.Items.Add(item);
         });
-        sendTo.IsEnabled = sendTo.Items.Count > 0 && !tab.SelectionOnPhone;
+        sendTo.IsEnabled = sendTo.Items.Count > 0 && tab.SelectionHasShellPaths;
 
         var menu = new ContextMenu();
         Control[] entries =

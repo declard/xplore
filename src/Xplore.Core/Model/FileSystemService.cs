@@ -15,6 +15,8 @@ public interface IFileSystemService
     // The entries of a location as they become available.
     IAsyncEnumerable<FsEntry> EnumerateAsync(string path, CancellationToken ct = default);
 
+    Task<IReadOnlyList<Breadcrumb>> BreadcrumbsAsync(string path, CancellationToken ct = default);
+
     LocationCapabilities CapabilitiesOf(string? location);
 
     IReadOnlyList<LocationVerb> VerbsOf(string? location);
@@ -43,6 +45,9 @@ public sealed class FileSystemService(FileLocationProvider files, IEnumerable<IL
     public IAsyncEnumerable<FsEntry> EnumerateAsync(string path, CancellationToken ct = default) =>
         ProviderFor(path).EnumerateAsync(path, ct);
 
+    public Task<IReadOnlyList<Breadcrumb>> BreadcrumbsAsync(string path, CancellationToken ct = default) =>
+        ProviderFor(path).BreadcrumbsAsync(path, ct);
+
     public LocationCapabilities CapabilitiesOf(string? location) =>
         location is null ? LocationCapabilities.None : ProviderFor(location).Capabilities;
 
@@ -53,7 +58,7 @@ public sealed class FileSystemService(FileLocationProvider files, IEnumerable<IL
     public async IAsyncEnumerable<FsEntry> Search(
         string path, string pattern, [EnumeratorCancellation] CancellationToken ct)
     {
-        if (ProviderFor(path) is var provider && provider != _files)
+        if (ProviderFor(path) is var provider && !provider.Capabilities.HasFlag(LocationCapabilities.Subfolders))
         {
             var matches = GlobSearch.FlatMatcher(pattern);
             await foreach (var e in provider.EnumerateAsync(path, ct).Where(matches))
@@ -64,7 +69,7 @@ public sealed class FileSystemService(FileLocationProvider files, IEnumerable<IL
             yield break;
         }
 
-        await foreach (var e in Streaming.Run(() => GlobSearch.Enumerate(path, pattern, ct).Select(FileLocationProvider.ToEntry), ct))
+        await foreach (var e in Streaming.Run(() => GlobSearch.Enumerate(path, pattern, ct).Select(FsEntry.From), ct))
         {
             yield return e;
         }

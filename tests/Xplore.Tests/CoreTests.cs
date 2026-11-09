@@ -130,7 +130,7 @@ public class GlobSearchTests : IDisposable
     public void Dispose() => Directory.Delete(_dir, true);
 
     private IEnumerable<string> Find(string pattern) =>
-        GlobSearch.Enumerate(_dir, pattern, CancellationToken.None).Select(i => Path.GetRelativePath(_dir, i.FullName)).Order();
+        GlobSearch.Enumerate(_dir, pattern, CancellationToken.None).Select(i => Path.GetRelativePath(_dir, i.Path)).Order();
 
     public GlobSearchTests()
     {

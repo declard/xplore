@@ -1,3 +1,4 @@
+using Xplore.Core.Storage;
 #pragma warning disable S2971
 
 using System.Collections.ObjectModel;
@@ -59,7 +60,7 @@ public sealed class MainViewModel : ObservableObject
     // The folders of the active tab and of the next tab (if any) as the default roots of the sync wizard.
     public (string Left, string Right) SyncRoots()
     {
-        static string Folder(TabViewModel? t) => t?.CurrentPath is { } p && Directory.Exists(p) ? p : "";
+        static string Folder(TabViewModel? t) => t?.CurrentPath is { } p && Stores.IsDirectory(p) ? p : "";
         return (Folder(SelectedTab), Tabs.Count > 1 ? Folder(Tabs[(Tabs.IndexOf(SelectedTab!) + 1) % Tabs.Count]) : "");
     }
 

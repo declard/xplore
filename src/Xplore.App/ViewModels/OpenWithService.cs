@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using Xplore.Core.Phone;
+using Xplore.Core.Storage;
 using Xplore.Core.Settings;
 using Xplore.Core.Shell;
 
@@ -35,7 +35,7 @@ public sealed class OpenWithService
 
     // The selected files when there are only files and they all share one "Open with" key (extension or file name).
     private IReadOnlyList<string> Targets =>
-        _selection() is var items && items.All(i => !i.Entry.IsDirectory && !PhonePath.Is(i.Entry.Path)) && items.Select(i => AppSettings.OpenWithKey(i.Entry.Path)).Distinct().Count() == 1
+        _selection() is var items && items.All(i => !i.Entry.IsDirectory && Stores.Has(i.Entry.Path, StoreCapabilities.RealPath)) && items.Select(i => AppSettings.OpenWithKey(i.Entry.Path)).Distinct().Count() == 1
             ? [.. items.Select(i => i.Entry.Path)]
             : [];
 

@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using Xplore.Core.Storage;
 
 namespace Xplore.Core.Model;
 
@@ -8,9 +9,7 @@ namespace Xplore.Core.Model;
 // A trailing separator restricts the matches to folders.
 public static class GlobSearch
 {
-    private static readonly EnumerationOptions Options = new() { IgnoreInaccessible = true, AttributesToSkip = 0 };
-
-    public static IEnumerable<FileSystemInfo> Enumerate(string root, string pattern, CancellationToken ct)
+    public static IEnumerable<StoreEntry> Enumerate(string root, string pattern, CancellationToken ct)
     {
         var segments = pattern.Split(['/', '\\'], StringSplitOptions.RemoveEmptyEntries).ToList();
         if (segments is [])
@@ -23,7 +22,7 @@ public static class GlobSearch
 
         var compiled = segments.Select(s => s == "**" ? null : ToRegex(s)).ToArray();
         var foldersOnly = pattern.EndsWith('/') || pattern.EndsWith('\\');
-        return Walk(new(root), compiled, 0, foldersOnly, ct).DistinctBy(i => i.FullName, StringComparer.OrdinalIgnoreCase);
+        return Walk(root, compiled, 0, foldersOnly, ct).DistinctBy(i => i.Path, StringComparer.OrdinalIgnoreCase);
     }
 
     // The flat variant for locations without folder levels: only a single-level pattern can match, against the entry names.
@@ -39,19 +38,19 @@ public static class GlobSearch
         return e => (!foldersOnly || e.IsDirectory) && regex.IsMatch(e.Name);
     }
 
-    private static IEnumerable<FileSystemInfo> Walk(DirectoryInfo dir, Regex?[] segments, int index, bool foldersOnly, CancellationToken ct)
+    private static IEnumerable<StoreEntry> Walk(string dir, Regex?[] segments, int index, bool foldersOnly, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         var segment = segments[index];
         var found = segment switch
         {
             null => Walk(dir, segments, index + 1, foldersOnly, ct)
-                .Concat(Subfolders(dir).SelectMany(sub => Walk(sub, segments, index, foldersOnly, ct))),
+                .Concat(Subfolders(dir).SelectMany(sub => Walk(sub.Path, segments, index, foldersOnly, ct))),
             _ when index == segments.Length - 1 =>
-                Children(dir).Where(e => (!foldersOnly || e is DirectoryInfo) && segment.IsMatch(e.Name)),
+                Children(dir).Where(e => (!foldersOnly || e.IsDirectory) && segment.IsMatch(e.Name)),
             _ => Subfolders(dir)
                 .Where(d => segment.IsMatch(d.Name))
-                .SelectMany(sub => Walk(sub, segments, index + 1, foldersOnly, ct)),
+                .SelectMany(sub => Walk(sub.Path, segments, index + 1, foldersOnly, ct)),
         };
 
         foreach (var entry in found)
@@ -60,11 +59,11 @@ public static class GlobSearch
         }
     }
 
-    private static List<FileSystemInfo> Children(DirectoryInfo dir)
+    private static List<StoreEntry> Children(string dir)
     {
         try
         {
-            return dir.EnumerateFileSystemInfos("*", Options).ToList();
+            return Stores.Children(dir).ToList();
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -72,8 +71,7 @@ public static class GlobSearch
         }
     }
 
-    private static IEnumerable<DirectoryInfo> Subfolders(DirectoryInfo dir) =>
-        Children(dir).OfType<DirectoryInfo>().Where(d => !d.Attributes.HasFlag(FileAttributes.ReparsePoint));
+    private static IEnumerable<StoreEntry> Subfolders(string dir) => Children(dir).Where(d => d.IsDirectory && !d.IsLink);
 
     private static Regex ToRegex(string glob)
     {
