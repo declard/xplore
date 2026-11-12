@@ -129,6 +129,7 @@ Menu.OpenWithApp.ToolTip: "{0}\nდააჭირეთ მარჯვენ�
 Menu.Paste: "ჩასმა"
 Menu.PasteShortcut: "მალსახმობის ჩასმა"
 Menu.Properties: "თვისებები"
+Menu.More: "მეტი…"
 Menu.Rename: "გადარქმევა"
 Menu.SendTo: "გაგზავნა"
 NewFile.Prompt: "ფაილის სახელი:"

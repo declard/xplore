@@ -129,6 +129,7 @@ Menu.OpenWithApp.ToolTip: "{0}\nЩракнете с десния бутон, з�
 Menu.Paste: "Поставяне"
 Menu.PasteShortcut: "Поставяне на пряк път"
 Menu.Properties: "Свойства"
+Menu.More: "Още…"
 Menu.Rename: "Преименуване"
 Menu.SendTo: "Изпращане до"
 NewFile.Prompt: "Име на файла:"

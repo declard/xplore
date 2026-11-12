@@ -129,6 +129,7 @@ Menu.OpenWithApp.ToolTip: "{0}\nКлацніть правою кнопкою, щ
 Menu.Paste: "Вставити"
 Menu.PasteShortcut: "Вставити ярлик"
 Menu.Properties: "Властивості"
+Menu.More: "Ще…"
 Menu.Rename: "Перейменувати"
 Menu.SendTo: "Надіслати"
 NewFile.Prompt: "Ім’я файлу:"

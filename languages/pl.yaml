@@ -129,6 +129,7 @@ Menu.OpenWithApp.ToolTip: "{0}\nKliknij prawym przyciskiem, aby usunąć z listy
 Menu.Paste: "Wklej"
 Menu.PasteShortcut: "Wklej skrót"
 Menu.Properties: "Właściwości"
+Menu.More: "Więcej…"
 Menu.Rename: "Zmień nazwę"
 Menu.SendTo: "Wyślij do"
 NewFile.Prompt: "Nazwa pliku:"

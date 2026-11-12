@@ -129,6 +129,7 @@ Menu.OpenWithApp.ToolTip: "{0}\nУмыту үшін тінтуірдің оң ж
 Menu.Paste: "Қою"
 Menu.PasteShortcut: "Таңбашаны қою"
 Menu.Properties: "Сипаттар"
+Menu.More: "Тағы…"
 Menu.Rename: "Атын өзгерту"
 Menu.SendTo: "Жіберу"
 NewFile.Prompt: "Файл аты:"

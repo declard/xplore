@@ -129,6 +129,7 @@ Menu.OpenWithApp.ToolTip: "{0}\nΔεξί κλικ για διαγραφή από
 Menu.Paste: "Επικόλληση"
 Menu.PasteShortcut: "Επικόλληση συντόμευσης"
 Menu.Properties: "Ιδιότητες"
+Menu.More: "Περισσότερα…"
 Menu.Rename: "Μετονομασία"
 Menu.SendTo: "Αποστολή προς"
 NewFile.Prompt: "Όνομα αρχείου:"

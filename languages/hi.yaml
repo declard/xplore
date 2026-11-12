@@ -129,6 +129,7 @@ Menu.OpenWithApp.ToolTip: "{0}\nहटाने के लिए राइट-�
 Menu.Paste: "पेस्ट करें"
 Menu.PasteShortcut: "शॉर्टकट पेस्ट करें"
 Menu.Properties: "गुण"
+Menu.More: "और…"
 Menu.Rename: "नाम बदलें"
 Menu.SendTo: "इसे भेजें"
 NewFile.Prompt: "फ़ाइल का नाम:"

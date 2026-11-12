@@ -129,6 +129,7 @@ Menu.OpenWithApp.ToolTip: "{0}\nԱջ սեղմեք՝ մոռանալու համա�
 Menu.Paste: "Տեղադրել"
 Menu.PasteShortcut: "Տեղադրել դյուրանցում"
 Menu.Properties: "Հատկություններ"
+Menu.More: "Ավելին…"
 Menu.Rename: "Վերանվանել"
 Menu.SendTo: "Ուղարկել"
 NewFile.Prompt: "Ֆայլի անուն՝"

@@ -129,6 +129,7 @@ Menu.OpenWithApp.ToolTip: "{0}\nSpustelėkite dešiniuoju pelės mygtuku, kad pa
 Menu.Paste: "Įklijuoti"
 Menu.PasteShortcut: "Įklijuoti nuorodą"
 Menu.Properties: "Ypatybės"
+Menu.More: "Daugiau…"
 Menu.Rename: "Pervardyti"
 Menu.SendTo: "Siųsti"
 NewFile.Prompt: "Failo pavadinimas:"
