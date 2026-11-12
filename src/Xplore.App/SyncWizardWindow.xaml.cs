@@ -1,4 +1,5 @@
 using Xplore.Core.Localization;
+using Xplore.Core.Model;
 using System.Windows;
 using Xplore.Core.Settings;
 using Xplore.Sync;
@@ -10,10 +11,12 @@ public partial class SyncWizardWindow : Window
 {
     private static string AllFiles => Loc.Get("Filter.AllFiles");
     private readonly SyncWizardViewModel _vm;
+    private readonly IFileSystemService _fs;
 
-    public SyncWizardWindow(string left, string right, TimestampFormat time, Action? filesChanged = null)
+    public SyncWizardWindow(IFileSystemService fs, string left, string right, TimestampFormat time, Action? filesChanged = null)
     {
         InitializeComponent();
+        _fs = fs;
         _vm = new SyncWizardViewModel(left, right, time, filesChanged)
         {
             Confirm = text => MessageBox.Show(this, text, Loc.Get("Sync.RunPlan.Title"), MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes,
@@ -52,26 +55,25 @@ public partial class SyncWizardWindow : Window
             "PlanTarget" => _vm.PlanTarget,
             _ => _vm.QuarantineFolder,
         };
-        var dialog = new OpenFolderDialog { Title = Loc.Get("Sync.Dialog.Folder"), InitialDirectory = Directory.Exists(current) ? current : null! };
-        if (dialog.ShowDialog(this) != true)
+        if (FolderPickerWindow.Pick(this, _fs, current) is not { } folder)
             return;
 
         switch (tag)
         {
             case "Left":
-                _vm.Left = dialog.FolderName;
+                _vm.Left = folder;
                 break;
             case "Right":
-                _vm.Right = dialog.FolderName;
+                _vm.Right = folder;
                 break;
             case "PlanSource":
-                _vm.PlanSource = dialog.FolderName;
+                _vm.PlanSource = folder;
                 break;
             case "PlanTarget":
-                _vm.PlanTarget = dialog.FolderName;
+                _vm.PlanTarget = folder;
                 break;
             default:
-                _vm.QuarantineFolder = dialog.FolderName;
+                _vm.QuarantineFolder = folder;
                 break;
         }
     }

@@ -13,5 +13,7 @@ public sealed class TabFactory(
     PathFormat format,
     TimestampFormat time)
 {
+    public IFileSystemService FileSystem => fs;
+
     public TabViewModel Create(string? location) => new(fs, prompts, bookmarks, history, openWith, settings, format, time, location);
 }

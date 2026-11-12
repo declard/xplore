@@ -1,6 +1,7 @@
-using Xplore.Core.Storage;
+using Xplore.Core.Model;
 #pragma warning disable S2971
 
+using Xplore.Core.Storage;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
@@ -44,6 +45,7 @@ public sealed class MainViewModel : ObservableObject
     public TimestampFormat TimestampFormat { get; }
     public ObservableCollection<TabViewModel> Tabs { get; } = [];
     public ActionHistoryStore History => _history;
+    public IFileSystemService FileSystem => _tabs.FileSystem;
     public ICommand UndoCommand { get; }
     public ICommand RedoCommand { get; }
     public ICommand NewTabCommand { get; }

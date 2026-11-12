@@ -387,7 +387,7 @@ public partial class MainWindow : Window
         }
 
         var (left, right) = Main.SyncRoots();
-        _syncWizard = new SyncWizardWindow(left, right, Main.TimestampFormat, () => Main.ReloadAllTabsAsync().Forget()) { Owner = this };
+        _syncWizard = new SyncWizardWindow(Main.FileSystem, left, right, Main.TimestampFormat, () => Main.ReloadAllTabsAsync().Forget()) { Owner = this };
         _syncWizard.Closed += (_, _) => _syncWizard = null;
         _syncWizard.Show();
     }
