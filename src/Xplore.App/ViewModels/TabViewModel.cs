@@ -96,7 +96,10 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
         BackCommand = new AsyncRelayCommand(() => ShowAsync(_history.Back()), () => _history.CanGoBack);
         ForwardCommand = new AsyncRelayCommand(() => ShowAsync(_history.Forward()), () => _history.CanGoForward);
         UpCommand = new AsyncRelayCommand(() => ShowAsync(_history.Up()), () => _history.CanGoUp);
-        RefreshCommand = new AsyncRelayCommand(ReloadAsync);
+        RefreshCommand = new AsyncRelayCommand(async () =>
+        {
+            await Task.WhenAll(ReloadAsync(), Tree.RefreshRootAsync());
+        });
         ToggleBookmarkCommand = new AsyncRelayCommand(() => _bookmarks.ToggleAsync(CurrentPath!), () => PathWith(LocationCapabilities.Bookmark) is not null);
         OpenCmdCommand = new AsyncRelayCommand(OpenCmd, () => PathWith(LocationCapabilities.Console) is not null);
         OpenSelectedCommand = new AsyncRelayCommand(OpenSelectedAsync, () => HasSelection);

@@ -145,29 +145,60 @@ public sealed class TreeNodeViewModel : ObservableObject
     // Icons, whether a child has subfolders and a drive's usage are probed together with the listing so the UI thread never touches the disk.
     private async Task LoadAsync(IFileSystemService fs)
     {
-        var isRoot = Path is null;
         try
         {
-            var probed = await Task.Run(async () => (isRoot
-                    ? await fs.StorageAsync()
-                    : [.. new FsSorting(foldersFirst: true).Sort(await SubfoldersAsync(fs), SortColumn.Name, true)])
-                .Select(e => (
-                    Entry: e,
-                    Icon: IconCache.For(e),
-                    HasChildren: fs.CapabilitiesOf(e.Path).HasFlag(LocationCapabilities.Subfolders) && HasSubfolders(e.Path),
-                    Usage: isRoot ? Usage(e.Path) : null))
-                .ToList());
-
+            var probed = await ProbeAsync(fs);
             Children.Clear();
-            foreach (var (e, icon, hasChildren, usage) in probed)
-            {
-                Children.Add(new TreeNodeViewModel(e.Path, e.Name, icon, fs, _selected!, hasChildren, usage));
-            }
+            probed.ForEach(Children.Add);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             Children.Clear();
         }
+    }
+
+    // Lists the children again, keeping the nodes that are still there (with their expansion) and adding or removing the rest in order.
+    public async Task RefreshAsync()
+    {
+        if (_fs is null || _load is null)
+            return;
+
+        await _load;
+        try
+        {
+            var probed = await ProbeAsync(_fs);
+            var existing = Children.Where(c => c.Path is not null).ToDictionary(c => c.Path!, StringComparer.OrdinalIgnoreCase);
+            var merged = probed.Select(n => existing.GetValueOrDefault(n.Path!) ?? n).ToList();
+            Children.Where(c => !merged.Contains(c)).ToList().ForEach(c => Children.Remove(c));
+            for (var i = 0; i < merged.Count; i++)
+            {
+                if (i < Children.Count && Children[i] == merged[i])
+                    continue;
+
+                Children.Remove(merged[i]);
+                Children.Insert(i, merged[i]);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // the nodes stay as they were
+        }
+    }
+
+    private async Task<List<TreeNodeViewModel>> ProbeAsync(IFileSystemService fs)
+    {
+        var isRoot = Path is null;
+        var probed = await Task.Run(async () => (isRoot
+                ? await fs.StorageAsync()
+                : [.. new FsSorting(foldersFirst: true).Sort(await SubfoldersAsync(fs), SortColumn.Name, true)])
+            .Select(e => (
+                Entry: e,
+                Icon: IconCache.For(e),
+                HasChildren: fs.CapabilitiesOf(e.Path).HasFlag(LocationCapabilities.Subfolders) && HasSubfolders(e.Path),
+                Usage: isRoot ? Usage(e.Path) : null))
+            .ToList());
+
+        return [.. probed.Select(p => new TreeNodeViewModel(p.Entry.Path, p.Entry.Name, p.Icon, fs, _selected!, p.HasChildren, p.Usage))];
     }
 
     private async Task<IReadOnlyList<FsEntry>> SubfoldersAsync(IFileSystemService fs) =>

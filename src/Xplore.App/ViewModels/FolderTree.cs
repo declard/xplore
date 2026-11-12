@@ -48,6 +48,11 @@ public sealed class FolderTree : IDisposable
 
     public async Task RevealAsync(string? path, CancellationToken ct)
     {
+        if (path is null)
+        {
+            await RefreshRootAsync();
+        }
+
         var node = path is null ? Root : await Root.RevealAsync(path);
         if (node is null || ct.IsCancellationRequested)
             return;
@@ -70,6 +75,9 @@ public sealed class FolderTree : IDisposable
 
     // Keeps the folders leading to the current location expanded and collapses every other expanded folder.
     public void CollapseOthers() => CollapseExcept(Root, _currentPath());
+
+    // Drives and devices that appeared or went away since the root was first listed.
+    public Task RefreshRootAsync() => Root.RefreshAsync();
 
     public void Dispose() => _bookmarks.Changed -= RefreshBookmarkNodes;
 
