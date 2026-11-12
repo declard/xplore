@@ -1,14 +1,14 @@
-using Xplore.Core.Localization;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using Xplore.App.Interaction;
 using Xplore.App.ViewModels;
-using Xplore.Core.Settings;
+using Xplore.Core.Localization;
 
 namespace Xplore.App;
 
@@ -47,6 +47,30 @@ public partial class MainWindow : Window
     }
 
     internal MainViewModel Main => (MainViewModel)DataContext;
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        var settle = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.5) };
+        settle.Tick += (_, _) =>
+        {
+            settle.Stop();
+            Main.DevicesChangedAsync().Forget();
+        };
+        const int WmDeviceChange = 0x0219;
+        const int DbtDevNodesChanged = 0x0007;
+        // The system sends this to every top-level window; it arrives in bursts while a device initializes, so only the quiet moment after it counts.
+        ((HwndSource)PresentationSource.FromVisual(this)!).AddHook((nint _, int msg, nint wParam, nint _, ref bool _) =>
+        {
+            if (msg == WmDeviceChange && wParam == DbtDevNodesChanged)
+            {
+                settle.Stop();
+                settle.Start();
+            }
+
+            return 0;
+        });
+    }
 
     internal TabViewModel? Tab => Main.SelectedTab;
 

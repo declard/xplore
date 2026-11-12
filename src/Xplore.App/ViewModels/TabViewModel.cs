@@ -202,6 +202,15 @@ public sealed class TabViewModel : ObservableObject, IFolderContext, IDisposable
 
     public Task ReloadAsync() => ShowAsync(_history, SelectedPaths);
 
+    public async Task DevicesChangedAsync()
+    {
+        await Tree.RefreshRootAsync();
+        if (CurrentPath is null)
+        {
+            await ReloadAsync();
+        }
+    }
+
     Task IFolderContext.RefreshAsync(IEnumerable<string>? select) => ShowAsync(_history, select);
 
     public Task JumpBackAsync(int steps) => ShowAsync(_history.BackBy(steps));

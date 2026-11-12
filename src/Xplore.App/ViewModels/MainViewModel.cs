@@ -1,4 +1,3 @@
-using Xplore.Core.Model;
 #pragma warning disable S2971
 
 using Xplore.Core.Storage;
@@ -6,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using Xplore.Core.Settings;
+using Xplore.Core.Model;
 
 namespace Xplore.App.ViewModels;
 
@@ -56,6 +56,8 @@ public sealed class MainViewModel : ObservableObject
         get;
         set => Set(ref field, value);
     }
+
+    public Task DevicesChangedAsync() => Task.WhenAll(Tabs.ToList().Select(t => t.DevicesChangedAsync()));
 
     public Task ReloadAllTabsAsync() => Task.WhenAll(Tabs.ToList().Select(t => t.ReloadAsync()));
 
