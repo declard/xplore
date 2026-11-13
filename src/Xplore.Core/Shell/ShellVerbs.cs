@@ -43,9 +43,6 @@ public static class ShellVerbs
     private static extern int SHCreateDataObject(IntPtr pidlFolder, uint count, IntPtr[] pidls, IntPtr inner, ref Guid iid, out IntPtr dataObject);
 
     [DllImport("shell32.dll")]
-    private static extern int SHMultiFileProperties(IntPtr dataObject, uint flags);
-
-    [DllImport("shell32.dll")]
     private static extern void ILFree(IntPtr pidl);
 
     private static Guid IidDataObject = new("0000010e-0000-0000-C000-000000000046");
@@ -58,7 +55,8 @@ public static class ShellVerbs
             return;
         }
 
-        Marshal.ThrowExceptionForHR(WithDataObject(paths, data => SHMultiFileProperties(data, 0)));
+        using var menu = ShellContextMenu.ForItems(paths, IntPtr.Zero);
+        menu.InvokeVerb("properties", IntPtr.Zero);
     }
 
     internal static IDataObject CreateDataObject(IReadOnlyList<string> paths) =>

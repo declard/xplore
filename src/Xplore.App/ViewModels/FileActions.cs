@@ -1,3 +1,4 @@
+using Xplore.App.Interaction;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Xplore.Core.History;
@@ -55,7 +56,7 @@ public sealed class FileActions
         NewFolderCommand = new AsyncRelayCommand(() => NewItem(isFolder: true), () => _folder.CurrentPath is not null);
         NewFileCommand = new AsyncRelayCommand(() => NewItem(isFolder: false), () => _folder.CurrentPath is not null);
         PropertiesCommand = new AsyncRelayCommand(
-            () => _runner.Run(() => ShellVerbs.Properties(HasSelection ? SelectedPaths : [_folder.CurrentPath!])),
+            () => _runner.RunAsync(() => ShellThread.Run(() => ShellVerbs.Properties(HasSelection ? SelectedPaths : [_folder.CurrentPath!]))),
             () => (HasSelection || _folder.CurrentPath is not null) && !OnPhone);
     }
 

@@ -238,19 +238,36 @@ public sealed partial class ShellContextMenu : IDisposable
         }
     }
 
-    public void Invoke(int id, IntPtr owner)
+    public void Invoke(int id, IntPtr owner) => InvokeCore(owner, verb => (IntPtr)(id - (int)FirstId), verbW => (IntPtr)(id - (int)FirstId));
+
+    // Runs a command by its canonical name ("properties") the way Explorer does, which also covers selections of several items.
+    public void InvokeVerb(string verb, IntPtr owner)
+    {
+        var ansi = Marshal.StringToHGlobalAnsi(verb);
+        var unicode = Marshal.StringToHGlobalUni(verb);
+        try
+        {
+            InvokeCore(owner, _ => ansi, _ => unicode);
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(ansi);
+            Marshal.FreeHGlobal(unicode);
+        }
+    }
+
+    private void InvokeCore(IntPtr owner, Func<int, IntPtr> verbA, Func<int, IntPtr> verbW)
     {
         var directory = Marshal.StringToHGlobalUni(_directory);
         var directoryAnsi = Marshal.StringToHGlobalAnsi(_directory);
         try
         {
-            var verb = (IntPtr)(id - (int)FirstId);
             var info = new InvokeInfo
             {
                 fMask = CmicMaskUnicode,
                 hwnd = owner,
-                lpVerb = verb,
-                lpVerbW = verb,
+                lpVerb = verbA(0),
+                lpVerbW = verbW(0),
                 lpDirectory = directoryAnsi,
                 lpDirectoryW = directory,
                 nShow = 1,
